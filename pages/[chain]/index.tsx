@@ -1,4 +1,4 @@
-import { paths } from '@reservoir0x/reservoir-sdk'
+import { paths } from '@sh-reservoir0x/reservoir-sdk'
 import { Head } from 'components/Head'
 import Layout from 'components/Layout'
 import { Footer } from 'components/home/Footer'
@@ -18,7 +18,7 @@ import * as Tabs from '@radix-ui/react-tabs'
 import {
   useTrendingCollections,
   useTrendingMints,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import ChainToggle from 'components/common/ChainToggle'
 import CollectionsTimeDropdown, {
   CollectionsSortingOption,
@@ -34,6 +34,12 @@ import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import { useMediaQuery } from 'react-responsive'
 import fetcher from 'utils/fetcher'
+import Image from 'next/image'
+import { formatUnits, zeroAddress } from 'viem'
+import { useTopCollection } from 'hooks/useTopCollection'
+import { useTopCollectionMint } from 'hooks/useTopCollectionMint'
+import dayjs from 'dayjs'
+import { useFeaturedCollection } from 'hooks/useFeaturedCollection'
 
 type TabValue = 'collections' | 'mints'
 
@@ -57,9 +63,9 @@ const Home: NextPage<Props> = ({ ssr }) => {
   const isSmallDevice = useMediaQuery({ query: '(max-width: 800px)' })
 
   const [tab, setTab] = useState<TabValue>('collections')
-  const [sortByTime, setSortByTime] = useState<CollectionsSortingOption>('24h')
+  const [sortByTime, setSortByTime] = useState<CollectionsSortingOption>('30d')
 
-  const [sortByPeriod, setSortByPeriod] = useState<MintsSortingOption>('24h')
+  const [sortByPeriod, setSortByPeriod] = useState<MintsSortingOption>('30d')
 
   let mintsQuery: Parameters<typeof useTrendingMints>['0'] = {
     limit: 20,
@@ -83,43 +89,50 @@ const Home: NextPage<Props> = ({ ssr }) => {
     }
   }, [router.query])
 
-  const {
-    data: trendingCollections,
-    isValidating: isTrendingCollectionsValidating,
-  } = useTrendingCollections(
-    {
-      limit: 20,
-      sortBy: 'volume',
-      period: sortByTime,
-    },
-    chain.id,
-    {
-      fallbackData: ssr.trendingCollections,
-      keepPreviousData: true,
-    }
-  )
+  const trendingCollections = ssr?.trendingCollections
+  const isTrendingCollectionsValidating = false
+  // const {
+  //   data: trendingCollections,
+  //   isValidating: isTrendingCollectionsValidating,
+  // } = useTrendingCollections(
+  //   {
+  //     limit: 20,
+  //     sortBy: 'volume',
+  //     period: sortByTime,
+  //   },
+  //   chain.id,
+  //   {
+  //     fallbackData: ssr.trendingCollections,
+  //     keepPreviousData: true,
+  //   }
+  // )
 
-  const {
-    data: featuredCollections,
-    isValidating: isFeaturedCollectionsValidating,
-  } = useTrendingCollections(
-    {
-      limit: 20,
-      sortBy: 'sales',
-      period: '24h',
-    },
-    chain.id,
-    {
-      fallbackData: ssr.featuredCollections,
-      keepPreviousData: true,
-    }
-  )
+  const featuredCollections = ssr?.featuredCollections?.slice(0, 5)
+  const isFeaturedCollectionsValidating = false
+  // const {
+  //   data: featuredCollections,
+  //   isValidating: isFeaturedCollectionsValidating,
+  // } = useTrendingCollections(
+  //   {
+  //     limit: 20,
+  //     sortBy: 'sales',
+  //     period: '30d',
+  //   },
+  //   chain.id,
+  //   {
+  //     fallbackData: ssr.featuredCollections,
+  //     keepPreviousData: true,
+  //   }
+  // )
 
-  const { data: trendingMints, isValidating: isTrendingMintsValidating } =
-    useTrendingMints({ ...mintsQuery }, chain.id, {
-      fallbackData: ssr.trendingMints,
-      keepPreviousData: true,
-    })
+  const trendingMints =
+    ssr?.trendingMints?.length > 0 ? ssr?.trendingMints?.slice(0, 50) : []
+  const isTrendingMintsValidating = false
+  // const { data: trendingMints, isValidating: isTrendingMintsValidating } =
+  //   useTrendingMints({ ...mintsQuery }, chain.id, {
+  //     fallbackData: ssr.trendingMints,
+  //     keepPreviousData: true,
+  //   })
 
   let volumeKey: ComponentPropsWithoutRef<
     typeof CollectionRankingsTable
@@ -140,6 +153,7 @@ const Home: NextPage<Props> = ({ ssr }) => {
   return (
     <Layout>
       <Head />
+
       <Box
         css={{
           p: 24,
@@ -157,6 +171,20 @@ const Home: NextPage<Props> = ({ ssr }) => {
             mb: 64,
           }}
         >
+          {/* <Flex
+            justify="between"
+            align="start"
+            css={{
+              gap: 24,
+              mb: '$5',
+            }}
+          >
+            <img
+              style={{ width: '100%', height: '500px', objectFit: 'fill' }}
+              src="/home/banner/seekhype.png"
+            ></img>
+          </Flex> */}
+
           <Flex
             justify="between"
             align="start"
@@ -166,7 +194,7 @@ const Home: NextPage<Props> = ({ ssr }) => {
             }}
           >
             <Text style="h4" as="h4">
-              Featured
+              FEATURED SHOWCASES
             </Text>
           </Flex>
           <Box
@@ -184,9 +212,9 @@ const Home: NextPage<Props> = ({ ssr }) => {
         >
           <Flex justify="between" align="start" css={{ mb: '$3' }}>
             <Text style="h4" as="h4">
-              Trending
+              TOP HYPE COLLECTIONS
             </Text>
-            {!isSmallDevice && (
+            {/* {!isSmallDevice && (
               <Flex
                 align="center"
                 css={{
@@ -209,13 +237,13 @@ const Home: NextPage<Props> = ({ ssr }) => {
                 )}
                 <ChainToggle />
               </Flex>
-            )}
+            )} */}
           </Flex>
           <TabsList css={{ mb: 24, mt: 0, borderBottom: 'none' }}>
             <TabsTrigger value="collections">Collections</TabsTrigger>
             <TabsTrigger value="mints">Mints</TabsTrigger>
           </TabsList>
-          {isSmallDevice && (
+          {/* {isSmallDevice && (
             <Flex
               justify="between"
               align="center"
@@ -242,7 +270,7 @@ const Home: NextPage<Props> = ({ ssr }) => {
                 <ChainToggle />
               </Flex>
             </Flex>
-          )}
+          )} */}
           <TabsContent value="collections">
             <Box
               css={{
@@ -253,8 +281,9 @@ const Home: NextPage<Props> = ({ ssr }) => {
                 {isSSR || !isMounted ? null : (
                   <CollectionRankingsTable
                     collections={trendingCollections || []}
-                    volumeKey={volumeKey}
+                    volumeKey={'allTime'}
                     loading={isTrendingCollectionsValidating}
+                    isIndex={true}
                   />
                 )}
                 <Box
@@ -276,6 +305,7 @@ const Home: NextPage<Props> = ({ ssr }) => {
                   <MintRankingsTable
                     mints={trendingMints || []}
                     loading={isTrendingMintsValidating}
+                    isIndex={true}
                   />
                 )}
                 <Box
@@ -294,7 +324,7 @@ const Home: NextPage<Props> = ({ ssr }) => {
         </Box>
       </Box>
 
-      <Footer />
+      {/* <Footer /> */}
     </Layout>
   )
 }
@@ -306,9 +336,9 @@ type TrendingMintsSchema =
 
 export const getServerSideProps: GetServerSideProps<{
   ssr: {
-    trendingMints: TrendingMintsSchema
-    trendingCollections: TrendingCollectionsSchema
-    featuredCollections: TrendingCollectionsSchema
+    trendingMints: TopCollectionMintItem[]
+    trendingCollections: TopCollectionItem[]
+    featuredCollections: TopCollectionItem[]
   }
 }> = async ({ params, res }) => {
   const chainPrefix = params?.chain || ''
@@ -324,7 +354,7 @@ export const getServerSideProps: GetServerSideProps<{
 
   let trendingCollectionsQuery: paths['/collections/trending/v1']['get']['parameters']['query'] =
     {
-      period: '24h',
+      period: '30d',
       limit: 20,
       sortBy: 'volume',
     }
@@ -337,7 +367,7 @@ export const getServerSideProps: GetServerSideProps<{
 
   let featuredCollectionQuery: paths['/collections/trending/v1']['get']['parameters']['query'] =
     {
-      period: '24h',
+      period: '30d',
       limit: 20,
       sortBy: 'sales',
     }
@@ -369,19 +399,368 @@ export const getServerSideProps: GetServerSideProps<{
     console.error(e)
   })
 
-  const trendingCollections: Props['ssr']['trendingCollections'] =
-    promises?.[0].status === 'fulfilled' && promises[0].value.data
-      ? (promises[0].value.data as Props['ssr']['trendingCollections'])
-      : {}
-  const featuredCollections: Props['ssr']['featuredCollections'] =
-    promises?.[1].status === 'fulfilled' && promises[1].value.data
-      ? (promises[1].value.data as Props['ssr']['featuredCollections'])
-      : {}
+  // top collection
+  const remapTopCollectionData = (collectionList: TopCollectionRawItem[]) => {
+    let result: TopCollectionItem[] = []
+    if (collectionList?.length > 0) {
+      collectionList?.forEach((collection) => {
+        const mappedItem: TopCollectionItem = {
+          banner: collection?.metadata?.bannerImageUrl || null,
+          collectionVolume: {
+            '1day': collection?.day1_volume
+              ? Number(formatUnits(BigInt(collection?.day1_volume), 18))
+              : 0,
+            '7day': collection?.day7_volume
+              ? Number(formatUnits(BigInt(collection?.day7_volume), 18))
+              : 0,
+            '30day': collection?.day30_volume
+              ? Number(formatUnits(BigInt(collection?.day30_volume), 18))
+              : 0,
+            allTime: collection?.all_time_volume
+              ? Number(formatUnits(BigInt(collection?.all_time_volume), 18))
+              : 0,
+          },
+          count: collection?.token_count,
+          countPercentChange: null,
+          description: collection?.metadata?.description || null,
+          floorAsk: {
+            id: collection?.floor_sell_id,
+            price: {
+              amount: {
+                decimal: collection?.floor_sell_value
+                  ? Number(
+                      formatUnits(BigInt(collection?.floor_sell_value), 18)
+                    )
+                  : 0,
+                native: collection?.floor_sell_value
+                  ? Number(
+                      formatUnits(BigInt(collection?.floor_sell_value), 18)
+                    )
+                  : 0,
+                raw: collection?.floor_sell_value?.toString() || null,
+                usd: null,
+              },
+              currency: {
+                contract: zeroAddress,
+              },
+            },
+            sourceDomain: '',
+          },
+          floorAskPercentChange: null,
+          volume: collection?.all_time_volume,
+          id:
+            collection?.contract?.indexOf('\\') > -1
+              ? collection?.contract?.replace('\\', '0')
+              : collection?.contract,
+          image: collection?.metadata?.imageUrl || null,
+          isSpam: false,
+          name: collection?.name,
+          onSaleCount: collection?.on_sale_count,
+          volumeChange: {
+            '1day': collection?.day1_volume_change,
+            '7day': collection?.day7_volume_change,
+            '30day': collection?.day30_volume_change,
+          },
+          tokenCount: collection?.token_count,
+          ownerCount: collection?.owner_count,
+          sampleImages: collection?.nfts?.map((x) => x?.image),
+        }
 
-  const trendingMints: Props['ssr']['trendingMints'] =
-    promises?.[1].status === 'fulfilled' && promises[1].value.data
-      ? (promises[1].value.data as Props['ssr']['trendingMints'])
-      : {}
+        result?.push(mappedItem)
+      })
+    }
+
+    return result
+  }
+
+  let topCollectionData: TopCollectionItem[] = []
+  await useTopCollection(100)?.then((res) => {
+    if (res) {
+      topCollectionData = remapTopCollectionData(
+        res?.data?.data?.evmevm_collections
+      )
+    }
+  })
+
+  // const trendingCollections: Props['ssr']['trendingCollections'] =
+  //   promises?.[0].status === 'fulfilled' && promises[0].value.data
+  //     ? (promises[0].value.data as Props['ssr']['trendingCollections'])
+  //     : {}
+  const trendingCollections = topCollectionData
+
+  // featured showcase
+  const remapData = (collectionList: TopCollectionRawItem[]) => {
+    let result: TopCollectionItem[] = []
+    if (collectionList?.length > 0) {
+      collectionList?.forEach((collection) => {
+        const mappedItem: TopCollectionItem = {
+          banner: collection?.metadata?.bannerImageUrl || null,
+          collectionVolume: {
+            '1day': collection?.day1_volume
+              ? Number(formatUnits(BigInt(collection?.day1_volume), 18))
+              : 0,
+            '7day': collection?.day7_volume
+              ? Number(formatUnits(BigInt(collection?.day7_volume), 18))
+              : 0,
+            '30day': collection?.day30_volume
+              ? Number(formatUnits(BigInt(collection?.day30_volume), 18))
+              : 0,
+            allTime: collection?.all_time_volume
+              ? Number(formatUnits(BigInt(collection?.all_time_volume), 18))
+              : 0,
+          },
+          count: collection?.token_count,
+          countPercentChange: null,
+          description: collection?.metadata?.description || null,
+          floorAsk: {
+            id: collection?.floor_sell_id,
+            price: {
+              amount: {
+                decimal: collection?.floor_sell_value
+                  ? Number(
+                      formatUnits(BigInt(collection?.floor_sell_value), 18)
+                    )
+                  : 0,
+                native: collection?.floor_sell_value
+                  ? Number(
+                      formatUnits(BigInt(collection?.floor_sell_value), 18)
+                    )
+                  : 0,
+                raw: collection?.floor_sell_value?.toString() || null,
+                usd: null,
+              },
+              currency: {
+                contract: zeroAddress,
+              },
+            },
+            sourceDomain: '',
+          },
+          floorAskPercentChange: null,
+          volume: collection?.all_time_volume,
+          id:
+            collection?.contract?.indexOf('\\') > -1
+              ? collection?.contract?.replace('\\', '0')
+              : collection?.contract,
+          image: collection?.metadata?.imageUrl || null,
+          isSpam: false,
+          name: collection?.name,
+          onSaleCount: collection?.on_sale_count,
+          volumeChange: {
+            '1day': collection?.day1_volume_change,
+            '7day': collection?.day7_volume_change,
+            '30day': collection?.day30_volume_change,
+          },
+          tokenCount: collection?.token_count,
+          ownerCount: collection?.owner_count,
+          sampleImages: collection?.nfts?.map((x) => x?.image),
+        }
+
+        result?.push(mappedItem)
+      })
+    }
+
+    return result
+  }
+
+  let featuredCollectionData: TopCollectionItem[] = []
+  await useFeaturedCollection(5)?.then((res) => {
+    if (res) {
+      featuredCollectionData = remapData(res?.data?.data?.evmevm_collections)
+    }
+  })
+
+  // const featuredCollections: Props['ssr']['featuredCollections'] =
+  //   promises?.[1].status === 'fulfilled' && promises[1].value.data
+  //     ? (promises[1].value.data as Props['ssr']['featuredCollections'])
+  //     : {}
+
+  // const featuredCollections =
+  //   featuredCollectionData?.length > 0
+  //     ? featuredCollectionData
+  //     : topCollectionData
+
+  const featuredCollections = featuredCollectionData
+
+  // top collection mint
+  const remapMintData = (collectionList: TopCollectionMintRawItem[]) => {
+    let result: TopCollectionMintItem[] = []
+    if (collectionList?.length > 0) {
+      collectionList?.forEach((collectionMint) => {
+        const existedCollectionIndex = result?.findIndex(
+          (x) => x?.id === collectionMint?.collection_id
+        )
+
+        if (existedCollectionIndex > -1) {
+          result[existedCollectionIndex]?.mintStages?.push({
+            stage: collectionMint?.stage,
+            kind: collectionMint?.kind,
+            price: {
+              currency: {
+                contract: zeroAddress,
+              },
+              amount: {
+                raw: collectionMint?.price,
+                decimal: collectionMint?.price
+                  ? Number(formatUnits(BigInt(collectionMint?.price), 18))
+                  : 0,
+                native: collectionMint?.price
+                  ? Number(formatUnits(BigInt(collectionMint?.price), 18))
+                  : 0,
+              },
+            },
+            startTime: dayjs(collectionMint?.start_time).unix(),
+            endTime: dayjs(collectionMint?.end_time).unix(),
+          })
+        } else {
+          const mappedItem: TopCollectionMintItem = {
+            banner:
+              collectionMint?.collection?.metadata?.bannerImageUrl || null,
+            collectionVolume: {
+              '1day': collectionMint?.collection?.day1_volume
+                ? Number(
+                    formatUnits(
+                      BigInt(collectionMint?.collection?.day1_volume),
+                      18
+                    )
+                  )
+                : 0,
+              '7day': collectionMint?.collection?.day7_volume
+                ? Number(
+                    formatUnits(
+                      BigInt(collectionMint?.collection?.day7_volume),
+                      18
+                    )
+                  )
+                : 0,
+              '30day': collectionMint?.collection?.day30_volume
+                ? Number(
+                    formatUnits(
+                      BigInt(collectionMint?.collection?.day30_volume),
+                      18
+                    )
+                  )
+                : 0,
+              allTime: collectionMint?.collection?.all_time_volume
+                ? Number(
+                    formatUnits(
+                      BigInt(collectionMint?.collection?.all_time_volume),
+                      18
+                    )
+                  )
+                : 0,
+            },
+            floorAsk: {
+              id: collectionMint?.collection?.floor_sell_id,
+              price: {
+                amount: {
+                  decimal: collectionMint?.collection?.floor_sell_value
+                    ? Number(
+                        formatUnits(
+                          BigInt(collectionMint?.collection?.floor_sell_value),
+                          18
+                        )
+                      )
+                    : 0,
+                  native: collectionMint?.collection?.floor_sell_value
+                    ? Number(
+                        formatUnits(
+                          BigInt(collectionMint?.collection?.floor_sell_value),
+                          18
+                        )
+                      )
+                    : 0,
+                  raw:
+                    collectionMint?.collection?.floor_sell_value?.toString() ||
+                    null,
+                  usd: null,
+                },
+                currency: {
+                  contract: zeroAddress,
+                },
+              },
+              sourceDomain: '',
+            },
+            id: collectionMint?.collection_id,
+            image: collectionMint?.collection?.metadata?.imageUrl || null,
+            isSpam: false,
+            name: collectionMint?.collection?.name,
+            onSaleCount: collectionMint?.collection?.on_sale_count,
+            volumeChange: {
+              '1day': collectionMint?.collection?.day1_volume_change,
+              '7day': collectionMint?.collection?.day7_volume_change,
+              '30day': collectionMint?.collection?.day30_volume_change,
+            },
+            tokenCount: collectionMint?.collection?.token_count,
+            ownerCount: collectionMint?.collection?.owner_count,
+            sampleImages: collectionMint?.collection?.nfts?.map(
+              (x) => x?.image
+            ),
+            description:
+              collectionMint?.collection?.metadata?.description || null,
+            isMinting: collectionMint?.collection?.is_minting,
+            mintType: '',
+            mintPrice: collectionMint?.price,
+            maxSupply: collectionMint?.max_supply,
+            mintStandard: collectionMint?.mint_standard?.standard,
+            createdAt: collectionMint?.created_at,
+            mintCount: collectionMint?.collection?.nfts_realtime_count,
+            sixHourCount: 0,
+            oneHourCount: 0,
+            mintVolume: collectionMint?.collection?.all_time_volume
+              ? Number(
+                  formatUnits(
+                    BigInt(collectionMint?.collection?.all_time_volume),
+                    18
+                  )
+                )
+              : 0,
+            mintStages: [
+              {
+                stage: collectionMint?.stage,
+                kind: collectionMint?.kind,
+                price: {
+                  currency: {
+                    contract: zeroAddress,
+                  },
+                  amount: {
+                    raw: collectionMint?.price,
+                    decimal: collectionMint?.price
+                      ? Number(formatUnits(BigInt(collectionMint?.price), 18))
+                      : 0,
+                    native: collectionMint?.price
+                      ? Number(formatUnits(BigInt(collectionMint?.price), 18))
+                      : 0,
+                  },
+                },
+                startTime: dayjs(collectionMint?.start_time).unix(),
+                endTime: dayjs(collectionMint?.end_time).unix(),
+              },
+            ],
+          }
+          if (mappedItem.mintStandard === 'zora') {
+            result?.push(mappedItem)
+          }
+        }
+      })
+    }
+
+    return result
+  }
+
+  let topCollectionMintData: TopCollectionMintItem[] = []
+  await useTopCollectionMint(1000)?.then((res) => {
+    if (res) {
+      topCollectionMintData = remapMintData(
+        res?.data?.data?.evmcollection_mints
+      )
+    }
+  })
+
+  // const trendingMints: Props['ssr']['trendingMints'] =
+  //   promises?.[1].status === 'fulfilled' && promises[1].value.data
+  //     ? (promises[1].value.data as Props['ssr']['trendingMints'])
+  //     : {}
+  const trendingMints = topCollectionMintData
 
   res.setHeader(
     'Cache-Control',

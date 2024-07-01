@@ -1,6 +1,6 @@
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useTrendingCollections } from '@reservoir0x/reservoir-kit-ui'
+import { useTrendingCollections } from '@sh-reservoir0x/reservoir-kit-ui'
 import { Box, Flex, FormatCryptoCurrency, Text } from 'components/primitives'
 import Img from 'components/primitives/Img'
 import { useMarketplaceChain } from 'hooks'
@@ -9,7 +9,8 @@ import Link from 'next/link'
 type TrendingCollections = ReturnType<typeof useTrendingCollections>['data']
 
 type FeaturedCardsProps = {
-  collections: TrendingCollections
+  // collections: TrendingCollections
+  collections: TopCollectionItem[]
   loading?: boolean
 }
 
@@ -17,6 +18,7 @@ export const FeaturedCards: React.FC<FeaturedCardsProps> = ({
   collections,
   loading,
 }) => {
+  console.log(collections)
   const marketplaceChain = useMarketplaceChain()
 
   if (!collections) return null
@@ -40,7 +42,8 @@ export const FeaturedCards: React.FC<FeaturedCardsProps> = ({
           align="center"
           css={{
             width: '100%',
-            overflowY: 'scroll',
+            overflowY: 'hiden',
+            overflowX: 'scroll',
             padding: '10px 5px',
             gap: '12px',
           }}
@@ -112,6 +115,7 @@ export const FeaturedCards: React.FC<FeaturedCardsProps> = ({
                         inset: '95px 0px 5px 5px',
                         border: '2px solid white',
                         borderRadius: 8,
+                        objectFit: 'cover',
                       }}
                     />
                   </Flex>
@@ -172,6 +176,7 @@ export const FeaturedCards: React.FC<FeaturedCardsProps> = ({
                             }
                             textStyle={'h6'}
                             logoHeight={12}
+                            maximumFractionDigits={2}
                             address={
                               collection?.floorAsk?.price?.currency?.contract
                             }
@@ -179,12 +184,25 @@ export const FeaturedCards: React.FC<FeaturedCardsProps> = ({
                         </Box>
 
                         <Box css={{ mr: '$4' }}>
-                          <Text style="subtitle2" color="subtle" as="p">
-                            6h Sales
+                          <Text
+                            style="subtitle2"
+                            color="subtle"
+                            as="p"
+                            css={{ mb: 2 }}
+                          >
+                            Total volume
                           </Text>
-                          <Text style="h6" as="h4" css={{ mt: 2 }}>
-                            {collection.count?.toLocaleString()}
-                          </Text>
+                          {/* <Text style="h6" as="h4" css={{ mt: 2 }}>
+                          {collection?.volume}
+                          </Text> */}
+                          <FormatCryptoCurrency
+                            amount={
+                              collection?.collectionVolume?.['allTime'] ?? 0
+                            }
+                            textStyle={'h6'}
+                            logoHeight={12}
+                            maximumFractionDigits={2}
+                          />
                         </Box>
                       </Flex>
                     </Box>

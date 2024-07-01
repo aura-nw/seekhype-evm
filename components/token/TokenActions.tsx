@@ -5,7 +5,7 @@ import {
   useCollections,
   useListings,
   useTokens,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import { AcceptBid, Bid, BuyNow, List } from 'components/buttons'
 import AddToCart from 'components/buttons/AddToCart'
 import CancelBid from 'components/buttons/CancelBid'
@@ -37,12 +37,13 @@ export const TokenActions: FC<Props> = ({
   account,
 }) => {
   const router = useRouter()
-  const bidOpenState = useState(true)
+  const bidOpenState = useState(false)
   const buyOpenState = useState(true)
   const [path, _] = router.asPath.split('?')
   const routerPath = path.split('/')
   const isBuyRoute = routerPath[routerPath.length - 1] === 'buy'
-  const queryBidId = router.query.bidId as string
+  // const queryBidId = router.query.bidId as string
+  const queryBidId = token?.market?.topBid?.id as string
   const deeplinkToAcceptBid = router.query.acceptBid === 'true'
   const is1155 = token?.token?.kind === 'erc1155'
 
@@ -66,6 +67,10 @@ export const TokenActions: FC<Props> = ({
     token?.market?.topBid?.maker?.toLowerCase() ===
       account?.address?.toLowerCase()
   const isListed = token ? token?.market?.floorAsk?.id !== null : false
+
+  const isListingOwner =
+    token?.market?.floorAsk?.maker?.toLowerCase() ===
+    account?.address?.toLowerCase()
 
   const offerIsOracleOrder = offer?.isNativeOffChainCancellable
 
@@ -97,6 +102,10 @@ export const TokenActions: FC<Props> = ({
     },
   }
 
+  let creatorRoyalties = collection?.royalties?.bps
+    ? collection?.royalties?.bps * 0.01
+    : 0
+
   return (
     <Grid
       align="center"
@@ -116,7 +125,9 @@ export const TokenActions: FC<Props> = ({
           mutate={mutate}
           buttonCss={buttonCss}
           buttonChildren={
-            token?.market?.floorAsk?.price?.amount?.decimal
+            token?.market?.floorAsk?.price?.amount?.decimal &&
+            token?.market?.floorAsk?.maker?.toLowerCase() ===
+              account?.address?.toLowerCase()
               ? 'Create New Listing'
               : 'List for Sale'
           }
@@ -124,7 +135,9 @@ export const TokenActions: FC<Props> = ({
       )}
       {(!isOwner || is1155) &&
         isListed &&
-        token?.market?.floorAsk?.price?.amount && (
+        token?.market?.floorAsk?.price?.amount &&
+        token?.market?.floorAsk?.maker?.toLowerCase() ===
+          token?.token?.owner?.toLowerCase() && (
           <Flex
             css={{ ...buttonCss, borderRadius: 8, overflow: 'hidden', gap: 1 }}
           >
@@ -138,7 +151,7 @@ export const TokenActions: FC<Props> = ({
               mutate={mutate}
               openState={!isOwner && isBuyRoute ? buyOpenState : undefined}
             />
-            {!is1155 && (
+            {/* {!is1155 && (
               <AddToCart
                 token={token}
                 buttonCss={{
@@ -148,7 +161,7 @@ export const TokenActions: FC<Props> = ({
                 }}
                 buttonProps={{ corners: 'square' }}
               />
-            )}
+            )} */}
           </Flex>
         )}
       {mintData && mintPrice ? (
@@ -190,6 +203,7 @@ export const TokenActions: FC<Props> = ({
           mutate={mutate}
           buttonCss={buttonCss}
           buttonChildren="Accept Offer"
+          collectionRoyalty={creatorRoyalties}
         />
       )}
 
@@ -260,7 +274,7 @@ export const TokenActions: FC<Props> = ({
         />
       )}
 
-      {isOwner && isListed && !is1155 && (
+      {isOwner && isListed && isListingOwner && !is1155 && (
         <CancelListing
           listingId={token?.market?.floorAsk?.id as string}
           mutate={mutate}

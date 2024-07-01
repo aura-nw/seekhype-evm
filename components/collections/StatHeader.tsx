@@ -1,4 +1,4 @@
-import { useCollections } from '@reservoir0x/reservoir-kit-ui'
+import { useCollections } from '@sh-reservoir0x/reservoir-kit-ui'
 import { Text, Box, FormatCryptoCurrency, Grid } from 'components/primitives'
 import { useMounted } from 'hooks'
 import { FC, ReactNode } from 'react'
@@ -56,8 +56,8 @@ const StatHeader: FC<StatHeaderProps> = ({ collection }) => {
           address={collection?.floorAsk?.price?.currency?.contract}
           decimals={collection?.floorAsk?.price?.currency?.decimals}
           logoHeight={18}
+          maximumFractionDigits={2}
           textStyle={'h6'}
-          maximumFractionDigits={4}
         />
       </StatBox>
 
@@ -68,7 +68,7 @@ const StatHeader: FC<StatHeaderProps> = ({ collection }) => {
           decimals={collection?.topBid?.price?.currency?.decimals}
           logoHeight={18}
           textStyle={'h6'}
-          maximumFractionDigits={4}
+          maximumFractionDigits={2}
         />
       </StatBox>
 
@@ -83,7 +83,7 @@ const StatHeader: FC<StatHeaderProps> = ({ collection }) => {
           amount={collection.volume?.allTime}
           logoHeight={18}
           textStyle={'h6'}
-          maximumFractionDigits={4}
+          maximumFractionDigits={2}
         />
       </StatBox>
 

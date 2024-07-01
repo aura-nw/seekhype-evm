@@ -7,64 +7,106 @@ import {
   FormatCurrency,
   Text,
 } from 'components/primitives'
-import { mainnet, polygon, optimism } from 'wagmi/chains'
+import { mainnet, polygon, optimism, sepolia, evmosTestnet } from 'wagmi/chains'
 import { useAccount, useBalance, useReadContracts } from 'wagmi'
 import { useMemo, useState } from 'react'
-import { zeroAddress, formatUnits, erc20Abi } from 'viem'
-import { useCoinConversion } from '@reservoir0x/reservoir-kit-ui'
+import { zeroAddress, formatUnits, erc20Abi, Address } from 'viem'
+import { useCoinConversion } from '@sh-reservoir0x/reservoir-kit-ui'
+import wrappedContracts from 'utils/wrappedContracts'
+import { aura } from 'utils/aura-chain'
 
 //CONFIGURABLE: Here you may configure currencies that you want to display in the wallet menu. Native currencies,
 //like ETH/MATIC etc need to be fetched in a different way. Configure them below
-const currencies = [
+const currencies: any[] = [
+  // {
+  //   address: zeroAddress,
+  //   symbol: 'ETH',
+  //   decimals: mainnet.nativeCurrency.decimals,
+  //   chain: {
+  //     id: mainnet.id,
+  //     name: mainnet.name,
+  //   },
+  //   coinGeckoId: 'ethereum',
+  // },
+  // {
+  //   address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+  //   symbol: 'WETH',
+  //   decimals: mainnet.nativeCurrency.decimals,
+  //   chain: {
+  //     id: mainnet.id,
+  //     name: mainnet.name,
+  //   },
+  //   coinGeckoId: 'weth',
+  // },
+  // {
+  //   address: zeroAddress,
+  //   symbol: 'MATIC',
+  //   decimals: polygon.nativeCurrency.decimals,
+  //   chain: {
+  //     id: polygon.id,
+  //     name: polygon.name,
+  //   },
+  //   coinGeckoId: 'matic-network',
+  // },
+  // {
+  //   address: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
+  //   symbol: 'WETH',
+  //   decimals: polygon.nativeCurrency.decimals,
+  //   chain: {
+  //     id: polygon.id,
+  //     name: polygon.name,
+  //   },
+  //   coinGeckoId: 'weth',
+  // },
+  // {
+  //   address: '0x4200000000000000000000000000000000000006',
+  //   symbol: 'WETH',
+  //   decimals: optimism.nativeCurrency.decimals,
+  //   chain: {
+  //     id: optimism.id,
+  //     name: optimism.name,
+  //   },
+  //   coinGeckoId: 'weth',
+  // },
+  // {
+  //   address: zeroAddress,
+  //   symbol: sepolia.nativeCurrency.symbol,
+  //   decimals: sepolia.nativeCurrency.decimals,
+  //   chain: {
+  //     id: sepolia.id,
+  //     name: sepolia.name,
+  //   },
+  //   coinGeckoId: 'ethereum',
+  // },
+  // {
+  //   address: wrappedContracts[sepolia.id],
+  //   symbol: 'WETH',
+  //   decimals: sepolia.nativeCurrency.decimals,
+  //   chain: {
+  //     id: sepolia.id,
+  //     name: sepolia.name,
+  //   },
+  //   coinGeckoId: 'ethereum',
+  // },
   {
     address: zeroAddress,
-    symbol: 'ETH',
-    decimals: mainnet.nativeCurrency.decimals,
+    symbol: aura.nativeCurrency.symbol,
+    decimals: aura.nativeCurrency.decimals,
     chain: {
-      id: mainnet.id,
-      name: mainnet.name,
+      id: aura.id,
+      name: aura.name,
     },
-    coinGeckoId: 'ethereum',
+    coinGeckoId: 'aura-network',
   },
   {
-    address: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-    symbol: 'WETH',
-    decimals: mainnet.nativeCurrency.decimals,
+    address: wrappedContracts[aura.id],
+    symbol: 'WAURA',
+    decimals: aura.nativeCurrency.decimals,
     chain: {
-      id: mainnet.id,
-      name: mainnet.name,
+      id: aura.id,
+      name: aura.name,
     },
-    coinGeckoId: 'weth',
-  },
-  {
-    address: zeroAddress,
-    symbol: 'MATIC',
-    decimals: polygon.nativeCurrency.decimals,
-    chain: {
-      id: polygon.id,
-      name: polygon.name,
-    },
-    coinGeckoId: 'matic-network',
-  },
-  {
-    address: '0x7ceb23fd6bc0add59e62ac25578270cff1b9f619',
-    symbol: 'WETH',
-    decimals: polygon.nativeCurrency.decimals,
-    chain: {
-      id: polygon.id,
-      name: polygon.name,
-    },
-    coinGeckoId: 'weth',
-  },
-  {
-    address: '0x4200000000000000000000000000000000000006',
-    symbol: 'WETH',
-    decimals: optimism.nativeCurrency.decimals,
-    chain: {
-      id: optimism.id,
-      name: optimism.name,
-    },
-    coinGeckoId: 'weth',
+    coinGeckoId: 'aura-network',
   },
 ]
 
@@ -110,6 +152,14 @@ const Wallet = () => {
     address,
     chainId: polygon.id,
   })
+  const sepoliaBalance = useBalance({
+    address,
+    chainId: sepolia.id,
+  })
+  const auraEVMBalance = useBalance({
+    address,
+    chainId: aura.id,
+  })
 
   const usdConversions = useCoinConversion(
     'USD',
@@ -135,6 +185,14 @@ const Wallet = () => {
           }
           case mainnet.id: {
             balance = ethBalance.data?.value || 0n
+            break
+          }
+          case sepolia.id: {
+            balance = sepoliaBalance.data?.value || 0n
+            break
+          }
+          case aura.id: {
+            balance = auraEVMBalance.data?.value || 0n
             break
           }
         }
@@ -171,7 +229,14 @@ const Wallet = () => {
       }
     }) as EnhancedCurrency[]
     //CONFIGURABLE: Configure these to regenerate whenever a native balance changes, non native balances are already handled
-  }, [usdConversions, nonNativeBalances, ethBalance, maticBalance])
+  }, [
+    usdConversions,
+    nonNativeBalances,
+    ethBalance,
+    maticBalance,
+    sepoliaBalance,
+    auraEVMBalance,
+  ])
 
   const totalUsdBalance = useMemo(() => {
     return enhancedCurrencies.reduce(
@@ -208,10 +273,10 @@ const Wallet = () => {
         <Button
           css={{ width: '100%', justifyContent: 'center' }}
           onClick={() => {
-            window.open('https://app.uniswap.org/', '_blank')
+            window.open(process.env.NEXT_PUBLIC_HALOTRADE_URL, '_blank')
           }}
         >
-          Add Funds
+          Get Aura
         </Button>
         {visibleCurrencies.map((currency, i) => {
           return (
@@ -239,7 +304,7 @@ const Wallet = () => {
               </Flex>
               <Flex direction="column" justify="center" css={{ width: '100%' }}>
                 <Flex justify="between">
-                  <Text style="body1">{currency.symbol}</Text>
+                  <Text style="body1">{currency.symbol.toUpperCase()}</Text>
                   <FormatCrypto
                     amount={currency.balance}
                     decimals={currency.decimals}
@@ -257,7 +322,7 @@ const Wallet = () => {
             </Flex>
           )
         })}
-        <Button
+        {/* <Button
           css={{
             width: '100%',
             justifyContent: 'center',
@@ -270,7 +335,7 @@ const Wallet = () => {
           }}
         >
           View {viewAll ? 'Fewer' : 'All'} Tokens
-        </Button>
+        </Button> */}
       </Flex>
     </Flex>
   )

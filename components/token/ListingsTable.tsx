@@ -1,6 +1,6 @@
 import { faGasPump, faTag } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useListings } from '@reservoir0x/reservoir-kit-ui'
+import { useListings } from '@sh-reservoir0x/reservoir-kit-ui'
 import { BuyNow } from 'components/buttons'
 import AddToCart from 'components/buttons/AddToCart'
 import CancelListing from 'components/buttons/CancelListing'
@@ -30,6 +30,7 @@ type Props = {
   token: Parameters<typeof useListings>['0']['token']
   is1155: boolean
   isOwner: boolean
+  usdPrice?: number
 }
 
 export const ListingsTable: FC<Props> = ({
@@ -37,6 +38,7 @@ export const ListingsTable: FC<Props> = ({
   address,
   is1155,
   isOwner,
+  usdPrice,
 }) => {
   const loadMoreRef = useRef<HTMLDivElement>(null)
   const loadMoreObserver = useIntersectionObserver(loadMoreRef, {})
@@ -120,6 +122,7 @@ export const ListingsTable: FC<Props> = ({
                   is1155={is1155}
                   isOwner={isOwner}
                   mutate={mutate}
+                  usdPrice={usdPrice}
                 />
               )
             })}
@@ -143,6 +146,7 @@ type ListingTableRowProps = {
   is1155: boolean
   isOwner: boolean
   address?: string
+  usdPrice?: number
   mutate?: MutatorCallback
 }
 
@@ -152,6 +156,7 @@ const ListingTableRow: FC<ListingTableRowProps> = ({
   is1155,
   isOwner,
   address,
+  usdPrice,
   mutate,
 }) => {
   const { displayName: fromDisplayName } = useENSResolver(listing.maker)
@@ -198,11 +203,12 @@ const ListingTableRow: FC<ListingTableRowProps> = ({
             amount={listing.price?.amount?.decimal}
             address={listing.price?.currency?.contract}
             logoHeight={16}
+            maximumFractionDigits={2}
             textStyle="h6"
           />
-          {listing.price?.amount?.usd ? (
+          {usdPrice ? (
             <Text style="body2" css={{ color: '$gray11' }} ellipsify>
-              {formatDollar(listing.price?.amount?.usd)}
+              {formatDollar((listing.price?.amount?.decimal || 0) * usdPrice)}
             </Text>
           ) : null}
           {listing?.quantityRemaining && listing?.quantityRemaining > 1 ? (
@@ -247,7 +253,7 @@ const ListingTableRow: FC<ListingTableRowProps> = ({
           ) : (
             <span>-</span>
           )}
-          <img width={16} height={16} src={listingSourceLogo} />
+          {/* <img width={16} height={16} src={listingSourceLogo} /> */}
         </Flex>
       </Flex>
       <Flex direction="column" align="end" css={{ gap: '$2' }}>

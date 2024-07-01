@@ -1,6 +1,6 @@
 import React, { ComponentProps, FC, useContext, useState } from 'react'
 import { useAccount } from 'wagmi'
-import { useCart } from '@reservoir0x/reservoir-kit-ui'
+import { useCart } from '@sh-reservoir0x/reservoir-kit-ui'
 import { Button } from 'components/primitives'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { CSS } from '@stitches/react'

@@ -4,7 +4,7 @@ import { Box, Button, Flex, Text } from 'components/primitives'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faXmark } from '@fortawesome/free-solid-svg-icons'
 import { useRouter } from 'next/router'
-import { useAttributes } from '@reservoir0x/reservoir-kit-ui'
+import { useAttributes } from '@sh-reservoir0x/reservoir-kit-ui'
 import { AttributeSelector } from './AttributeSelector'
 import { clearAllAttributes } from 'utils/router'
 import { FullscreenModal } from 'components/common/FullscreenModal'
@@ -23,7 +23,7 @@ export const MobileAttributeFilters: FC<Props> = ({
   const [filtersLength, setFiltersLength] = useState(0)
 
   useEffect(() => {
-    let filters = []
+    let filters: any[] = []
 
     // Extract all queries of attribute type
     Object.keys({ ...router.query }).map((key) => {

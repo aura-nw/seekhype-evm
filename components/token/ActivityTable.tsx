@@ -13,7 +13,7 @@ import {
   useCollectionActivity,
   useTokenActivity,
   useUsersActivity,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import LoadingSpinner from 'components/common/LoadingSpinner'
 import { useENSResolver, useMarketplaceChain, useTimeSince } from 'hooks'
 import Link from 'next/link'
@@ -232,6 +232,7 @@ const ActivityTableRow: FC<ActivityTableRowProps> = ({ activity }) => {
                   amount={activity.price.amount?.decimal}
                   address={activity.price.currency?.contract}
                   logoHeight={16}
+                  maximumFractionDigits={2}
                   textStyle="subtitle1"
                   css={{ mr: '$2', fontSize: '14px' }}
                 />
@@ -250,14 +251,14 @@ const ActivityTableRow: FC<ActivityTableRowProps> = ({ activity }) => {
                 gap: '$3',
               }}
             >
-              {!!activity.order?.source?.icon && (
+              {/* {!!activity.order?.source?.icon && (
                 <img
                   width="20px"
                   height="20px"
                   src={(activity.order?.source?.icon as string) || ''}
                   alt={`${activity.order?.source?.name} Source`}
                 />
-              )}
+              )} */}
               <Text style="subtitle3" color="subtle">
                 {useTimeSince(activity?.timestamp)}
               </Text>
@@ -354,6 +355,7 @@ const ActivityTableRow: FC<ActivityTableRowProps> = ({ activity }) => {
                 amount={activity.price.amount?.decimal}
                 address={activity.price.currency?.contract}
                 logoHeight={16}
+                maximumFractionDigits={2}
                 textStyle="subtitle1"
                 css={{ mr: '$2', fontSize: '14px' }}
               />
@@ -372,14 +374,14 @@ const ActivityTableRow: FC<ActivityTableRowProps> = ({ activity }) => {
               gap: '$3',
             }}
           >
-            {!!activity.order?.source?.icon && (
+            {/* {!!activity.order?.source?.icon && (
               <img
                 width="20px"
                 height="20px"
                 src={(activity.order?.source?.icon as string) || ''}
                 alt={`${activity.order?.source?.name} Source`}
               />
-            )}
+            )} */}
             <Text style="body2" color="subtle">
               {useTimeSince(activity?.timestamp)}
             </Text>

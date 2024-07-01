@@ -1,5 +1,5 @@
-import { useReservoirClient } from '@reservoir0x/reservoir-kit-ui'
-import { paths } from '@reservoir0x/reservoir-sdk'
+import { useReservoirClient } from '@sh-reservoir0x/reservoir-kit-ui'
+import { paths } from '@sh-reservoir0x/reservoir-sdk'
 import useMarketplaceChain from './useMarketplaceChain'
 import useSWR from 'swr'
 

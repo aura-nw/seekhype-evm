@@ -52,6 +52,7 @@ export const ChainStats = () => {
           amount={stats.totalVolume}
           textStyle="h6"
           logoHeight={14}
+          maximumFractionDigits={2}
         />
       )
     }

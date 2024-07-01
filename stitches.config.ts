@@ -49,6 +49,11 @@ export const { createTheme, keyframes, styled, globalCss, getCssText } =
         ...green,
         ...indigo,
 
+        //Seekhype
+        'button-bg-bg-primary-active': '#ff0192',
+        'button-bg-bg-primary-hover': '#e80185',
+        'form-input-text-text-default': '#706d77',
+
         //Aliases
         primary1: '$iris1',
         primary2: '$iris2',

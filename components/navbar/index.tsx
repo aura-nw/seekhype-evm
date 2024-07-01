@@ -18,6 +18,7 @@ import CartButton from './CartButton'
 import { AccountSidebar } from 'components/navbar/AccountSidebar'
 
 import * as HoverCard from '@radix-ui/react-hover-card'
+import { WalletButton } from '@rainbow-me/rainbowkit'
 
 export const NAVBAR_HEIGHT = 81
 export const NAVBAR_HEIGHT_MOBILE = 77
@@ -29,6 +30,11 @@ const Navbar = () => {
   const isMounted = useMounted()
   const { routePrefix } = useMarketplaceChain()
   const { address } = useAccount()
+
+  const logoSrc =
+    theme === 'dark'
+      ? '/sh-evm-logo-white.svg'
+      : '/sh-evm-logo.svg'
 
   let searchRef = useRef<HTMLInputElement>(null)
 
@@ -64,12 +70,11 @@ const Navbar = () => {
       <Box css={{ flex: 1 }}>
         <Flex align="center">
           <Link href={`/${routePrefix}`}>
-            <Box css={{ width: 46, cursor: 'pointer' }}>
-              <Image
-                src="/reservoirLogo.svg"
-                width={36}
-                height={36}
-                alt="Reservoir"
+            <Box css={{ width: 124, cursor: 'pointer' }}>
+              <img
+                src={logoSrc}
+                style={{ width: '100%', height: '100%' }}
+                alt="SeekHypeEVM"
               />
             </Box>
           </Link>
@@ -77,7 +82,7 @@ const Navbar = () => {
       </Box>
       <Flex align="center" css={{ gap: '$3' }}>
         <MobileSearch key={`${router.asPath}-search`} />
-        <CartButton />
+        {/* <CartButton /> */}
         <HamburgerMenu key={`${router.asPath}-hamburger`} />
       </Flex>
     </Flex>
@@ -113,12 +118,11 @@ const Navbar = () => {
       >
         <Flex align="center">
           <Link href={`/${routePrefix}`}>
-            <Box css={{ cursor: 'pointer' }}>
-              <Image
-                src="/reservoirLogo.svg"
-                width={36}
-                height={36}
-                alt="Reservoir"
+            <Box css={{ cursor: 'pointer', width: 124 }}>
+              <img
+                src={logoSrc}
+                style={{ width: '100%', height: '100%' }}
+                alt="SeekHypeEVM"
               />
             </Box>
           </Link>
@@ -129,13 +133,11 @@ const Navbar = () => {
               ml: '$5',
             }}
           >
-            <Link href={`/${routePrefix}`}>
-              <NavItem>Explore</NavItem>
-            </Link>
-
             <HoverCard.Root openDelay={200}>
               <HoverCard.Trigger>
-                <NavItem>Trending</NavItem>
+                <Link href={`/${routePrefix}`}>
+                  <NavItem>Explore</NavItem>
+                </Link>
               </HoverCard.Trigger>
               <HoverCard.Content sideOffset={24} align="start">
                 <Card css={{ p: 24, width: 240, border: '1px solid $gray4' }}>
@@ -161,6 +163,27 @@ const Navbar = () => {
                 <NavItem>Tokens</NavItem>
               </Link>
             )}
+
+            <HoverCard.Root openDelay={200}>
+              <HoverCard.Trigger>
+                <NavItem> Resources </NavItem>
+              </HoverCard.Trigger>
+              <HoverCard.Content sideOffset={24} align="start">
+                <Card css={{ p: 24, width: 240, border: '1px solid $gray4' }}>
+                  <Flex css={{ gap: '$4' }} direction="column">
+                    <Link href={`https://blog.seekhype.io/`} target="_blank">
+                      <NavItem> Blog </NavItem>
+                    </Link>
+                    <Link
+                      href={`https://blog.seekhype.io/join-the-seekhype-ambassador-empower-engage-elevate/`}
+                      target="_blank"
+                    >
+                      <NavItem> Ambassador </NavItem>
+                    </Link>
+                  </Flex>
+                </Card>
+              </HoverCard.Content>
+            </HoverCard.Root>
           </Flex>
         </Flex>
       </Box>
@@ -185,7 +208,7 @@ const Navbar = () => {
         align="center"
       >
         <Flex css={{ gap: '$5', mr: 12 }}>
-          <Box>
+          {/* <Box>
             <HoverCard.Root openDelay={120}>
               <HoverCard.Trigger>
                 <a target="_blank" href={`https://docs.reservoir.tools/docs`}>
@@ -226,11 +249,11 @@ const Navbar = () => {
                 </Card>
               </HoverCard.Content>
             </HoverCard.Root>
-          </Box>
+          </Box> */}
           {isConnected && (
             <Link href={`/portfolio/${address || ''}?chain=${routePrefix}`}>
               <Box css={{ mr: '$2' }}>
-                <NavItem>Portfolio</NavItem>
+                <NavItem>Profile</NavItem>
               </Box>
             </Link>
           )}
@@ -243,7 +266,7 @@ const Navbar = () => {
             <ConnectWalletButton />
           </Box>
         )}
-        <CartButton />
+        {/* <CartButton /> */}
       </Flex>
     </Flex>
   )

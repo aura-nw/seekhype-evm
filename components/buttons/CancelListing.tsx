@@ -2,7 +2,7 @@ import { useConnectModal } from '@rainbow-me/rainbowkit'
 import {
   CancelListingModal,
   CancelListingStep,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import { FC, ReactElement, useContext, cloneElement } from 'react'
 import { SWRResponse } from 'swr'
 import { useWalletClient } from 'wagmi'

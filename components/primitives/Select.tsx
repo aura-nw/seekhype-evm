@@ -87,7 +87,8 @@ export const Select: React.FC<
         <SelectDownIcon />
       </StyledTrigger>
     )}
-    <SelectPrimitive.Portal style={{ zIndex: 1000000 }}>
+    {/* <SelectPrimitive.Portal style={{ zIndex: 1000000 }}> */}
+    <SelectPrimitive.Portal>
       <StyledContent>
         <SelectPrimitive.ScrollUpButton />
         <SelectPrimitive.Viewport>{children}</SelectPrimitive.Viewport>

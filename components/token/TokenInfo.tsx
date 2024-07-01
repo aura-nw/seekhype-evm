@@ -3,7 +3,7 @@ import {
   useCollections,
   useMarketplaceConfigs,
   useTokens,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import { Anchor, Button, Flex, Text, Tooltip } from 'components/primitives'
 import { ComponentPropsWithoutRef, FC, useRef, useState, useMemo } from 'react'
 import { faDiscord, faTwitter } from '@fortawesome/free-brands-svg-icons'
@@ -93,11 +93,12 @@ export const TokenInfo: FC<Props> = ({ token, collection }) => {
 
   const etherscanImage = (
     <img
-      src={
-        isMounted && theme === 'dark'
-          ? '/icons/etherscan-logo-light-circle.svg'
-          : '/icons/etherscan-logo-circle.svg'
-      }
+      // src={
+      //   isMounted && theme === 'dark'
+      //     ? '/icons/etherscan-logo-light-circle.svg'
+      //     : '/icons/etherscan-logo-circle.svg'
+      // }
+      src="https://aurascan.io/assets/images/logo/title-logo.png"
       alt={`${
         marketplaceChain.blockExplorers?.default.name || 'Ethereum'
       } Icon`}
@@ -108,7 +109,7 @@ export const TokenInfo: FC<Props> = ({ token, collection }) => {
 
   const blockExplorerUrl = `${
     marketplaceChain?.blockExplorers?.default.url || 'https://etherscan.io'
-  }/token/${token?.token?.contract}?a=${token?.token?.tokenId}`
+  }/evm-contracts/${token?.token?.contract}`
   const twitterLink = collection?.twitterUsername
     ? `https://twitter.com/${collection?.twitterUsername}`
     : null

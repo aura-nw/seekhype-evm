@@ -9,7 +9,7 @@ import {
   slideUp,
 } from '../primitives/Collapsible'
 import * as CollapsiblePrimitive from '@radix-ui/react-collapsible'
-import { Execute } from '@reservoir0x/reservoir-sdk'
+import { Execute } from '@sh-reservoir0x/reservoir-sdk'
 import { BatchListingData } from './BatchListModal'
 import { styled } from '@stitches/react'
 import { Marketplace } from './BatchListings'

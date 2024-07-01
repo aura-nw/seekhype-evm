@@ -13,8 +13,8 @@ import {
   useDynamicTokens,
   useAttributes,
   useReservoirClient,
-} from '@reservoir0x/reservoir-kit-ui'
-import { paths } from '@reservoir0x/reservoir-sdk'
+} from '@sh-reservoir0x/reservoir-kit-ui'
+import { paths } from '@sh-reservoir0x/reservoir-sdk'
 import Layout from 'components/Layout'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { truncateAddress } from 'utils/truncate'
@@ -61,7 +61,11 @@ import CopyText from 'components/common/CopyText'
 import { CollectionDetails } from 'components/collections/CollectionDetails'
 import useTokenUpdateStream from 'hooks/useTokenUpdateStream'
 import LiveState from 'components/common/LiveState'
-import { Address } from 'viem'
+import { Address, formatUnits } from 'viem'
+import titleCase from 'utils/titleCase'
+import { formatNumber } from 'utils/numbers'
+import { useCountAllowList } from 'hooks/useCountAllowList'
+import dayjs from 'dayjs'
 
 type ActivityTypes = Exclude<
   NonNullable<
@@ -76,7 +80,7 @@ type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 
 const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
   const router = useRouter()
-  const { address } = useAccount()
+  const { address, isConnected } = useAccount()
   const [attributeFiltersOpen, setAttributeFiltersOpen] = useState(false)
   const [activityFiltersOpen, setActivityFiltersOpen] = useState(true)
   const [tokenSearchQuery, setTokenSearchQuery] = useState<string>('')
@@ -102,11 +106,14 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
   const isMintRoute = routerPath[routerPath.length - 1] === 'mint'
   const sweepOpenState = useState(true)
   const mintOpenState = useState(true)
+  const [isDisabledMint, setIsDisabledMint] = useState<boolean>(false)
+  const [whitelistMaxPerWallet, setWhitelistMaxPerWallet] = useState<number>(0)
+  const [mintPrice, setMintPrice] = useState<string>('')
 
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const collectionChain =
     supportedChains.find(
-      (chain) => router.query?.chain === chain.routePrefix,
+      (chain) => router.query?.chain === chain.routePrefix
     ) || DefaultChain
 
   const scrollToTop = () => {
@@ -128,15 +135,23 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
   })
 
   let collection = collections && collections[0]
+  let inAllowList = null
+  const [allowListQuantity, setAllowListQuantity] = useState<number>(0)
 
   const mintData = collection?.mintStages?.find(
-    (stage) => stage.kind === 'public',
+    (stage) => stage?.kind === 'public' || stage?.kind === 'allowlist'
   )
 
-  const mintPriceDecimal = mintData?.price?.amount?.decimal
-  const mintCurrency = mintData?.price?.currency?.symbol?.toUpperCase()
+  const currentMintStage = getCurrentPhase(collection?.mintStages as any[])
 
-  const mintPrice =
+  const mintStageKindText =
+    currentMintStage?.kind === 'public' ? 'Public' : 'Whitelist'
+
+  const mintPriceDecimal = currentMintStage?.price?.amount?.decimal
+  const mintCurrency =
+    currentMintStage?.price?.currency?.symbol?.toUpperCase() || 'AURA'
+
+  const mintPriceVal =
     typeof mintPriceDecimal === 'number' &&
     mintPriceDecimal !== null &&
     mintPriceDecimal !== undefined
@@ -144,6 +159,87 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
         ? 'Free'
         : `${mintPriceDecimal} ${mintCurrency}`
       : undefined
+
+  // setMintPrice(mintPriceVal || '')
+
+  useEffect(() => {
+    resetCache()
+    setMintPrice(mintPriceVal || '')
+  }, [mintPriceVal])
+
+  useEffect(() => {
+    if (currentMintStage?.kind === 'allowlist') {
+      useCountAllowList(collections[0]?.id).then((countRes) => {
+        const currentPhase = countRes?.data?.data?.evmcollection_mints?.find(
+          (x: any) => {
+            if (
+              x?.start_time &&
+              dayjs(x?.start_time).isBefore() &&
+              !x?.end_time
+            ) {
+              return x
+            }
+
+            if (
+              x?.start_time &&
+              dayjs(x?.start_time).isBefore() &&
+              x?.end_time &&
+              dayjs(x?.end_time).isAfter()
+            ) {
+              return x
+            }
+
+            if (!x?.start_time && !x?.end_time) {
+              return x
+            }
+          }
+        )
+        if (
+          currentPhase?.allow_list_item?.allowlists_items &&
+          currentPhase?.allow_list_item?.allowlists_items?.length > 0
+        ) {
+          setAllowListQuantity(
+            currentPhase?.allow_list_item?.allowlists_items?.length
+          )
+
+          // set max can mint per wallet for whitelist phase
+          setWhitelistMaxPerWallet(
+            currentPhase?.allow_list_item?.allowlists_items[0].max_mints
+          )
+
+          setMintPrice(
+            `${
+              formatUnits(
+                currentPhase?.allow_list_item?.allowlists_items[0]?.price?.toString() ||
+                  '0',
+                18
+              ).toString() || ''
+            } ${mintCurrency}`
+          )
+
+          inAllowList = currentPhase?.allow_list_item?.allowlists_items?.find(
+            (i: any) =>
+              i?.address?.replace('\\', '0')?.toLowerCase() ===
+              address?.toLowerCase()
+          )
+
+          setIsDisabledMint(
+            currentMintStage?.kind === 'allowlist' && !inAllowList
+          )
+
+          if (currentMintStage?.standard !== 'zora') {
+            setIsDisabledMint(true)
+          }
+        } else {
+          setIsDisabledMint(false)
+        }
+      })
+    } else {
+      if (currentMintStage?.standard !== 'zora') {
+        setIsDisabledMint(true)
+      }
+    }
+  }, [currentMintStage])
 
   let tokenQuery: Parameters<typeof useDynamicTokens>['0'] = {
     limit: 20,
@@ -213,7 +309,7 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
         ? reservoirEvent.data?.market?.floorAskNormalized?.price?.amount?.native
         : reservoirEvent.data?.market?.floorAsk?.price?.amount?.native
       const tokenIndex = tokens.findIndex(
-        (token) => token.token?.tokenId === reservoirEvent?.data.token.tokenId,
+        (token) => token.token?.tokenId === reservoirEvent?.data.token.tokenId
       )
       const token = tokenIndex > -1 ? tokens[tokenIndex] : null
       if (token) {
@@ -226,7 +322,7 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
       if (!price) {
         if (token) {
           const endOfListingsIndex = tokens.findIndex(
-            (token) => !token.market?.floorAsk?.price?.amount?.native,
+            (token) => !token.market?.floorAsk?.price?.amount?.native
           )
           if (endOfListingsIndex === -1) {
             hasChange = true
@@ -235,8 +331,8 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
               sortBy === 'rarity'
                 ? tokenIndex
                 : endOfListingsIndex > -1
-                  ? endOfListingsIndex
-                  : 0
+                ? endOfListingsIndex
+                : 0
             newTokens.splice(newTokenIndex, 0, {
               ...token,
               market: {
@@ -292,16 +388,16 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
           [
             {
               tokens: newTokens,
-            },
+            } as any,
           ],
           {
             revalidate: false,
             optimisticData: [
               {
                 tokens: newTokens,
-              },
+              } as any,
             ],
-          },
+          }
         )
       }
     },
@@ -315,7 +411,7 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
     }
     return attributesData.data
       ?.filter(
-        (attribute) => attribute.kind != 'number' && attribute.kind != 'range',
+        (attribute) => attribute.kind != 'number' && attribute.kind != 'range'
       )
       .sort((a, b) => a.key.localeCompare(b.key))
   }, [attributesData.data])
@@ -328,7 +424,7 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
     collection?.tokenCount &&
       +collection.tokenCount >= 2 &&
       attributes &&
-      attributes?.length >= 2,
+      attributes?.length >= 2
   )
 
   const hasSecurityConfig =
@@ -380,8 +476,8 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
                 <meta
                   property="fc:frame:button:2"
                   content={`Collect ${
-                    collection.floorAsk.price.amount.native
-                  } ${collection.floorAsk.price.currency?.symbol?.toUpperCase()}`}
+                    collection?.floorAsk?.price?.amount?.native
+                  } ${collection?.floorAsk?.price?.currency?.symbol?.toUpperCase()}`}
                 />
                 <meta property="fc:frame:button:2:action" content="link" />
                 <meta
@@ -437,7 +533,7 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
               >
                 <Flex css={{ gap: '$4', flex: 1 }} align="center">
                   <Img
-                    src={optimizeImage(collection.image!, 72 * 2)}
+                    src={optimizeImage(collection?.image!, 72 * 2)}
                     width={72}
                     height={72}
                     css={{
@@ -518,7 +614,7 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
                         <Text style="body3">{chainName}</Text>
                       </Flex>
 
-                      {mintData && (
+                      {mintData && currentMintStage && (
                         <Flex
                           align="center"
                           css={{
@@ -541,7 +637,7 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
               </Flex>
               <Flex align="center">
                 <Flex css={{ alignItems: 'center', gap: '$3' }}>
-                  {collection?.floorAsk?.price?.amount?.raw && sweepSymbol ? (
+                  {/* {collection?.floorAsk?.price?.amount?.raw && sweepSymbol ? (
                     <Sweep
                       collectionId={collection.id}
                       openState={isSweepRoute ? sweepOpenState : undefined}
@@ -584,64 +680,198 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
                       buttonCss={{ '@lg': { order: 2 } }}
                       mutate={mutate}
                     />
-                  ) : null}
+                  ) : null} */}
                   {/* Collection Mint */}
-                  {mintData && mintPrice ? (
-                    <Mint
-                      collectionId={collection.id}
-                      openState={isMintRoute ? mintOpenState : undefined}
-                      buttonChildren={
-                        <Flex
-                          css={{ gap: '$2', px: '$2' }}
-                          align="center"
-                          justify="center"
-                        >
-                          {isSmallDevice && (
-                            <FontAwesomeIcon icon={faSeedling} />
-                          )}
-                          {!isSmallDevice && (
-                            <Text style="h6" as="h6" css={{ color: '$bg' }}>
-                              Mint
-                            </Text>
-                          )}
+                  {currentMintStage ? (
+                    <Flex direction="column">
+                      <Flex justify={isSmallDevice ? 'start' : 'end'}>
+                        {dayjs.unix(currentMintStage?.startTime).isBefore() && (
+                          <Mint
+                            collectionId={collection.id}
+                            openState={isMintRoute ? mintOpenState : undefined}
+                            disabled={isDisabledMint}
+                            buttonChildren={
+                              <Flex
+                                css={{ gap: '$2', px: '$2' }}
+                                align="center"
+                                justify="center"
+                              >
+                                <Text style="h6" as="h6" css={{ color: '$bg' }}>
+                                  Mint
+                                </Text>
 
-                          {!isSmallDevice && (
+                                {mintPrice && (
+                                  <Text
+                                    style="h6"
+                                    as="h6"
+                                    css={{ color: '$bg', fontWeight: 900 }}
+                                  >
+                                    {`${mintPrice}`}
+                                  </Text>
+                                )}
+                              </Flex>
+                            }
+                            buttonCss={{
+                              minWidth: 'max-content',
+                              whiteSpace: 'nowrap',
+                              flexShrink: 0,
+                              flexGrow: 1,
+                              justifyContent: 'center',
+                              px: '$2',
+                              maxWidth: '220px',
+                              '@md': {
+                                order: 1,
+                              },
+                            }}
+                            mutate={mutate}
+                            maxMintQuantity={currentMintStage?.maxMints}
+                            maxMintPerWallet={
+                              currentMintStage?.kind === 'allowlist'
+                                ? whitelistMaxPerWallet
+                                : currentMintStage?.maxMintsPerWallet
+                            }
+                          />
+                        )}
+                      </Flex>
+                      {currentMintStage?.kind === 'allowlist' &&
+                        isDisabledMint &&
+                        isConnected && (
+                          <Flex
+                            justify="end"
+                            css={{
+                              mt: '10px',
+                            }}
+                          >
                             <Text
-                              style="h6"
-                              as="h6"
-                              css={{ color: '$bg', fontWeight: 900 }}
+                              style="body3"
+                              css={{
+                                color: '$bg',
+                              }}
                             >
-                              {`${mintPrice}`}
+                              You are not whitelisted.
                             </Text>
-                          )}
+                          </Flex>
+                        )}
+                      {/* mint phase*/}
+                      {currentMintStage ? (
+                        <Flex
+                          justify="end"
+                          css={{
+                            background: '#DEDEDE50',
+                            mt: '10px',
+                            padding: '10px',
+                            pl: '20px',
+                          }}
+                        >
+                          <Flex direction="column">
+                            <Flex css={{ gap: 5 }} justify="end">
+                              <Text
+                                style="body3"
+                                css={{
+                                  color: '$bg',
+                                }}
+                              >
+                                {titleCase(mintStageKindText)}
+                              </Text>
+                              {currentMintStage?.kind === 'allowlist' && (
+                                <Text style={'body3'} css={{ fontWeight: 700 }}>
+                                  {formatNumber(allowListQuantity)}
+                                </Text>
+                              )}
+                              {/* {currentMintStage?.maxMints ? (
+                                <Flex align={'center'} css={{ gap: '4px' }}>
+                                  <Text
+                                    style={'body3'}
+                                    css={{ fontWeight: 700 }}
+                                  >
+                                    {formatNumber(currentMintStage?.maxMints)}
+                                  </Text>
+                                  <Text style={'body3'} color={'subtle'}>
+                                    {currentMintStage?.maxMints > 1
+                                      ? 'items'
+                                      : 'item'}
+                                  </Text>
+                                </Flex>
+                              ) : (
+                                <Flex align={'center'} css={{ gap: '4px' }}>
+                                  <Text style={'body3'} color={'subtle'}>
+                                    Unlimited
+                                  </Text>
+                                </Flex>
+                              )} */}
+
+                              {currentMintStage?.maxMintsPerWallet ||
+                              whitelistMaxPerWallet ? (
+                                <Flex align={'center'} css={{ gap: '8px' }}>
+                                  <Text style={'body3'} color={'subtle'}>
+                                    •
+                                  </Text>
+                                  <Text
+                                    as="p"
+                                    style="body3"
+                                    css={{
+                                      color: '$bg',
+                                    }}
+                                  >
+                                    Max{' '}
+                                    <Text
+                                      style="body3"
+                                      css={{ color: '$bg', fontWeight: 600 }}
+                                    >
+                                      {currentMintStage?.kind === 'allowlist'
+                                        ? whitelistMaxPerWallet
+                                        : currentMintStage?.maxMintsPerWallet}
+                                    </Text>{' '}
+                                    per wallet
+                                  </Text>
+                                </Flex>
+                              ) : (
+                                <Flex align={'center'} css={{ gap: '8px' }}>
+                                  <Text style={'body3'} color={'subtle'}>
+                                    •
+                                  </Text>
+                                  <Text
+                                    style="body3"
+                                    css={{ color: '$bg', fontWeight: 600 }}
+                                  >
+                                    Unlimited per wallet
+                                  </Text>
+                                </Flex>
+                              )}
+                            </Flex>
+                            {currentMintStage?.startTime &&
+                              currentMintStage?.endTime && (
+                                <Flex css={{ padding: '10px 0 0 0' }}>
+                                  <Text
+                                    as="p"
+                                    style="body3"
+                                    css={{ color: '$bg', mr: '5px' }}
+                                  >
+                                    {dayjs
+                                      .unix(currentMintStage?.startTime)
+                                      .format('MMM DD, YYYY hh:mm a')}{' '}
+                                    -{' '}
+                                    {dayjs
+                                      .unix(currentMintStage?.endTime)
+                                      .format('MMM DD, YYYY hh:mm a')}
+                                  </Text>
+                                </Flex>
+                              )}
+                          </Flex>
                         </Flex>
-                      }
-                      buttonCss={{
-                        minWidth: 'max-content',
-                        whiteSpace: 'nowrap',
-                        flexShrink: 0,
-                        flexGrow: 1,
-                        justifyContent: 'center',
-                        px: '$2',
-                        maxWidth: '220px',
-                        '@md': {
-                          order: 1,
-                        },
-                      }}
-                      mutate={mutate}
-                    />
+                      ) : null}
+                    </Flex>
                   ) : null}
-                  <CollectionOffer
+                  {/* <CollectionOffer
                     collection={collection}
                     buttonChildren={<FontAwesomeIcon icon={faHand} />}
                     buttonProps={{ color: mintData ? 'gray3' : 'primary' }}
                     buttonCss={{ px: '$4' }}
                     mutate={mutate}
-                  />
+                  /> */}
                 </Flex>
               </Flex>
             </Flex>
-
             <TabsList css={{ mt: 0 }}>
               <TabsTrigger value="items">Items</TabsTrigger>
               <TabsTrigger value="details">Details</TabsTrigger>
@@ -764,9 +994,8 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
                       <Text style="body1" as="p" color="subtle">
                         Floor
                       </Text>
-                      <Text style="body1" as="p" css={{ fontWeight: '700' }}>
-                        {collection?.floorAsk?.price?.amount?.raw &&
-                        sweepSymbol ? (
+                      <Text style="body1" css={{ fontWeight: '700' }}>
+                        {collection?.floorAsk?.price?.amount?.raw ? (
                           <Flex
                             css={{
                               gap: '$2',
@@ -778,17 +1007,18 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
                                 collection?.floorAsk?.price?.currency?.decimals
                               }
                               logoHeight={14}
-                              textStyle="subtitle1"
-                              maximumFractionDigits={4}
+                              textStyle="body1"
+                              css={{ fontWeight: '700' }}
+                              maximumFractionDigits={2}
                             />
-                            {sweepSymbol}
+                            {/* {sweepSymbol} */}
                           </Flex>
                         ) : (
                           '-'
                         )}
                       </Text>
                     </Flex>
-                    <Flex css={{ gap: '$1' }}>
+                    {/* <Flex css={{ gap: '$1' }}>
                       <Text style="body1" as="p" color="subtle">
                         Top Bid
                       </Text>
@@ -799,7 +1029,7 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
                             }`
                           : '-'}
                       </Text>
-                    </Flex>
+                    </Flex> */}
                     <Flex css={{ gap: '$1' }}>
                       <Text style="body1" as="p" color="subtle">
                         Count
@@ -848,10 +1078,11 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
                                 setPlayingElement(element)
                               }
                             }}
-                            addToCartEnabled={
-                              token.market?.floorAsk?.maker?.toLowerCase() !==
-                              address?.toLowerCase()
-                            }
+                            // addToCartEnabled={
+                            //   token.market?.floorAsk?.maker?.toLowerCase() !==
+                            //   address?.toLowerCase()
+                            addToCartEnabled={false}
+                            showSource={false}
                           />
                         ))}
                     <Box
@@ -968,12 +1199,13 @@ export const getServerSideProps: GetServerSideProps<{
       id,
       includeSalesCount: true,
       normalizeRoyalties: NORMALIZE_ROYALTIES,
+      includeMintStages: true,
     }
 
   const collectionsPromise = fetcher(
     `${reservoirBaseUrl}/collections/v7`,
     collectionQuery,
-    headers,
+    headers
   )
 
   let tokensQuery: paths['/tokens/v6']['get']['parameters']['query'] = {
@@ -991,7 +1223,7 @@ export const getServerSideProps: GetServerSideProps<{
   const tokensPromise = fetcher(
     `${reservoirBaseUrl}/tokens/v6`,
     tokensQuery,
-    headers,
+    headers
   )
 
   const promises = await Promise.allSettled([
@@ -1009,17 +1241,77 @@ export const getServerSideProps: GetServerSideProps<{
 
   const hasAttributes =
     tokens?.tokens?.some(
-      (token) => (token?.token?.attributes?.length || 0) > 0,
+      (token) => (token?.token?.attributes?.length || 0) > 0
     ) || false
 
   res.setHeader(
     'Cache-Control',
-    'public, s-maxage=30, stale-while-revalidate=60',
+    'public, s-maxage=30, stale-while-revalidate=60'
   )
 
   return {
     props: { ssr: { collection, tokens, hasAttributes }, id },
   }
+}
+const getCurrentActivePhase = (mintstages: any[]): any => {
+  if (mintstages?.length > 0) {
+    const result = mintstages.find((x) => {
+      if (x?.startTime && dayjs.unix(x?.startTime).isBefore() && !x?.endTime) {
+        return x
+      }
+
+      if (
+        x?.startTime &&
+        dayjs.unix(x?.startTime).isBefore() &&
+        x?.endTime &&
+        dayjs.unix(x?.endTime).isAfter()
+      ) {
+        return x
+      }
+
+      if (!x?.startTime && !x?.endTime) {
+        return x
+      }
+    })
+    return result
+  }
+
+  return undefined
+}
+
+const getCurrentPhase = (mintstages: any[]): any => {
+  let result = undefined
+
+  if (mintstages?.length > 0) {
+    mintstages = mintstages?.sort((a, b) => a?.startTime - b?.startTime)
+    result = mintstages.find((x) => {
+      // live
+      if (x?.startTime && dayjs.unix(x?.startTime).isBefore() && !x?.endTime) {
+        return x
+      }
+
+      if (
+        x?.startTime &&
+        dayjs.unix(x?.startTime).isBefore() &&
+        x?.endTime &&
+        dayjs.unix(x?.endTime).isAfter()
+      ) {
+        return x
+      }
+
+      if (!x?.startTime && !x?.endTime) {
+        return x
+      }
+
+      // upcoming
+      if (x?.startTime && dayjs.unix(x?.startTime).isAfter()) {
+        return x
+      }
+    })
+    return result
+  }
+
+  return result
 }
 
 export default CollectionPage

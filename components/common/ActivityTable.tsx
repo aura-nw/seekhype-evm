@@ -1,7 +1,7 @@
 import {
   useCollectionActivity,
   useUsersActivity,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import { FC, useEffect, useRef, useMemo } from 'react'
 import { useMediaQuery } from 'react-responsive'
 import {
@@ -207,14 +207,14 @@ const ActivityTableRow: FC<ActivityTableRowProps> = ({ activity }) => {
                 </Text>
               </Flex>
               <Flex align="center" justify="end" css={{ gap: '$3' }}>
-                {!!activity.order?.source?.icon && (
+                {/* {!!activity.order?.source?.icon && (
                   <img
                     width="20px"
                     height="20px"
                     src={(activity.order?.source?.icon as string) || ''}
                     alt={`${activity.order?.source?.name} Source`}
                   />
-                )}
+                )} */}
                 <Text
                   style="subtitle3"
                   css={{ fontSize: '12px', color: '$gray11' }}
@@ -292,6 +292,7 @@ const ActivityTableRow: FC<ActivityTableRowProps> = ({ activity }) => {
                     address={activity.price.currency?.contract}
                     logoHeight={16}
                     textStyle="subtitle1"
+                    maximumFractionDigits={2}
                     css={{ mr: '$2', fontSize: '14px' }}
                   />
                 </Flex>
@@ -312,9 +313,9 @@ const ActivityTableRow: FC<ActivityTableRowProps> = ({ activity }) => {
                   <Text
                     style="subtitle3"
                     css={{
-                      color: '$primary11',
+                      color: '$button-bg-bg-primary-active',
                       '&:hover': {
-                        color: '$primary10',
+                        color: '$button-bg-bg-primary-hover',
                       },
                     }}
                   >
@@ -335,9 +336,9 @@ const ActivityTableRow: FC<ActivityTableRowProps> = ({ activity }) => {
                   <Text
                     style="subtitle3"
                     css={{
-                      color: '$primary11',
+                      color: '$button-bg-bg-primary-active',
                       '&:hover': {
-                        color: '$primary10',
+                        color: '$button-bg-bg-primary-hover',
                       },
                     }}
                   >
@@ -422,22 +423,30 @@ const ActivityTableRow: FC<ActivityTableRowProps> = ({ activity }) => {
         activity.type &&
         activity.type !== 'transfer' ? (
           <Flex align="center">
-            <FormatCryptoCurrency
-              amount={
-                activity.price.amount?.decimal || activity.price.amount?.raw
-              }
-              address={activity.price.currency?.contract}
-              logoHeight={16}
-              textStyle="h6"
-              css={{ mr: '$2', fontSize: '16px' }}
-            />
+            {(activity.price.amount?.decimal &&
+              activity.price.amount?.decimal > 0) ||
+            (activity.price.amount?.raw &&
+              Number(activity.price.amount?.raw) > 0) ? (
+              <FormatCryptoCurrency
+                amount={
+                  activity.price.amount?.decimal || activity.price.amount?.raw
+                }
+                address={activity.price.currency?.contract}
+                logoHeight={16}
+                textStyle="h6"
+                css={{ mr: '$2', fontSize: '16px' }}
+                maximumFractionDigits={2}
+              />
+            ) : (
+              <span>-</span>
+            )}
           </Flex>
         ) : (
           <span>-</span>
         )}
       </TableCell>
       <TableCell>
-        {activity.amount ? (
+        {/* {activity.amount ? (
           <Flex direction="column" align="start">
             <Text style="subtitle3" color="subtle">
               Quantity
@@ -446,7 +455,7 @@ const ActivityTableRow: FC<ActivityTableRowProps> = ({ activity }) => {
           </Flex>
         ) : (
           <span>-</span>
-        )}
+        )} */}
       </TableCell>
       <TableCell css={{ minWidth: 0 }}>
         {activity.fromAddress && activity.fromAddress !== zeroAddress ? (
@@ -467,9 +476,9 @@ const ActivityTableRow: FC<ActivityTableRowProps> = ({ activity }) => {
               <Text
                 style="subtitle3"
                 css={{
-                  color: '$primary11',
+                  color: '$button-bg-bg-primary-active',
                   '&:hover': {
-                    color: '$primary10',
+                    color: '$button-bg-bg-primary-hover',
                   },
                 }}
                 ellipsify
@@ -501,9 +510,9 @@ const ActivityTableRow: FC<ActivityTableRowProps> = ({ activity }) => {
               <Text
                 style="subtitle3"
                 css={{
-                  color: '$primary11',
+                  color: '$button-bg-bg-primary-active',
                   '&:hover': {
-                    color: '$primary10',
+                    color: '$button-bg-bg-primary-hover',
                   },
                 }}
                 ellipsify
@@ -518,14 +527,14 @@ const ActivityTableRow: FC<ActivityTableRowProps> = ({ activity }) => {
       </TableCell>
       <TableCell css={{ minWidth: 0 }}>
         <Flex align="center" justify="end" css={{ gap: '$3' }}>
-          {!!activity.order?.source?.icon && (
+          {/* {!!activity.order?.source?.icon && (
             <img
               width="20px"
               height="20px"
               src={(activity.order?.source?.icon as string) || ''}
               alt={`${activity.order?.source?.name} Source`}
             />
-          )}
+          )} */}
           <Text style="subtitle3" color="subtle" ellipsify>
             {useTimeSince(activity?.timestamp)}
           </Text>

@@ -5,8 +5,8 @@ import {
   Currency,
   Listing,
   useReservoirClient,
-} from '@reservoir0x/reservoir-kit-ui'
-import { Execute } from '@reservoir0x/reservoir-sdk'
+} from '@sh-reservoir0x/reservoir-kit-ui'
+import { Execute } from '@sh-reservoir0x/reservoir-sdk'
 import LoadingSpinner from 'components/common/LoadingSpinner'
 import { Modal } from 'components/common/Modal'
 import TransactionProgress from 'components/common/TransactionProgress'

@@ -22,7 +22,8 @@ const CryptoCurrencyIcon: FC<Props> = ({
 
   return (
     <StyledImg
-      src={`${process.env.NEXT_PUBLIC_PROXY_URL}${chain?.proxyApi ?? proxyApi}/redirect/currency/${address}/icon/v1`}
+      src={`https://aurascan.io/assets/images/logo/title-logo.png`}
+      // src={`${process.env.NEXT_PUBLIC_PROXY_URL}${chain?.proxyApi ?? proxyApi}/redirect/currency/${address}/icon/v1`}
       css={css}
     />
   )

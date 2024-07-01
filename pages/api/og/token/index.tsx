@@ -1,4 +1,4 @@
-import { Token } from '@reservoir0x/reservoir-kit-ui'
+import { Token } from '@sh-reservoir0x/reservoir-kit-ui'
 import { ImageResponse } from '@vercel/og'
 import { NextRequest } from 'next/server'
 import chains from '../../../../utils/chains'

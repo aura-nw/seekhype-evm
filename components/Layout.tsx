@@ -2,6 +2,7 @@ import { Box } from 'components/primitives'
 import { FC, ReactNode } from 'react'
 import Navbar from './navbar'
 import UnsupportedChainBanner from './UnsupportedChainBanner'
+import { Footer } from './home/Footer'
 
 type Props = {
   children: ReactNode
@@ -22,6 +23,7 @@ const Layout: FC<Props> = ({ children }) => {
           <Navbar />
           <UnsupportedChainBanner />
           <main>{children}</main>
+          <Footer />
         </Box>
       </Box>
     </>

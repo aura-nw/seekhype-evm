@@ -19,7 +19,7 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { Currency } from '@reservoir0x/reservoir-kit-ui'
+import { Currency } from '@sh-reservoir0x/reservoir-kit-ui'
 import expirationOptions from 'utils/defaultExpirationOptions'
 import { ExpirationOption } from 'types/ExpirationOption'
 import { UserToken } from 'pages/portfolio/[[...address]]'
@@ -290,26 +290,26 @@ export const BatchListingsTableRow: FC<BatchListingsTableRowProps> = ({
                   size="large"
                   css={{ minWidth: 'max-content', minHeight: 48, py: 14 }}
                   disabled={
-                    !listing.token?.token?.collection?.floorAsk?.price?.amount
+                    !listing.token?.token?.collection?.floorAskPrice?.amount
                       ?.decimal
                   }
                   onClick={() => {
                     if (
-                      listing.token?.token?.collection?.floorAsk?.price?.amount
+                      listing.token?.token?.collection?.floorAskPrice?.amount
                         ?.decimal
                     ) {
                       handlePriceChange(
-                        listing.token?.token?.collection?.floorAsk?.price?.amount?.decimal?.toString()
+                        listing.token?.token?.collection?.floorAskPrice?.amount?.decimal?.toString()
                       )
                     }
                   }}
                 >
                   Floor
                 </Button>
-                {listing.token?.token?.collection?.floorAsk?.price?.amount
+                {listing.token?.token?.collection?.floorAskPrice?.amount
                   ?.decimal ? (
                   <Text style="subtitle3" color="subtle">
-                    {`${listing.token?.token?.collection?.floorAsk?.price?.amount?.decimal} ${listing.token?.token?.collection?.floorAsk?.price?.currency?.symbol}`}
+                    {`${listing.token?.token?.collection?.floorAskPrice?.amount?.decimal} ${listing.token?.token?.collection?.floorAskPrice?.currency?.symbol}`}
                   </Text>
                 ) : null}
               </Flex>
@@ -330,7 +330,7 @@ export const BatchListingsTableRow: FC<BatchListingsTableRowProps> = ({
                   <Text style="subtitle3" color="subtle">
                     {topTraitPrice}{' '}
                     {
-                      listing.token?.token?.collection?.floorAsk?.price
+                      listing.token?.token?.collection?.floorAskPrice
                         ?.currency?.symbol
                     }
                   </Text>
@@ -467,6 +467,7 @@ export const BatchListingsTableRow: FC<BatchListingsTableRowProps> = ({
             amount={creatorRoyalties * Number(price)}
             address={listing.currency.contract}
             logoHeight={14}
+            maximumFractionDigits={2}
             textStyle="body1"
             css={{
               width: '100%',
@@ -483,6 +484,7 @@ export const BatchListingsTableRow: FC<BatchListingsTableRowProps> = ({
             amount={marketplaceFee}
             address={listing.currency.contract}
             logoHeight={14}
+            maximumFractionDigits={2}
             textStyle="body1"
           />
           <Text style="body1" color="subtle" ellipsify>
@@ -496,6 +498,7 @@ export const BatchListingsTableRow: FC<BatchListingsTableRowProps> = ({
             address={listing.currency.contract}
             amount={profit}
             logoHeight={14}
+            maximumFractionDigits={2}
             textStyle="body1"
           />
         </Flex>

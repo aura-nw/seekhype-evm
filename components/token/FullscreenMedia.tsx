@@ -17,7 +17,7 @@ import {
   TokenMedia,
   useTokens,
   extractMediaType,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import { AnimatePresence, motion } from 'framer-motion'
 
 type Props = {

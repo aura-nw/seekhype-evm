@@ -14,7 +14,7 @@ import {
 } from '../primitives'
 import { useIntersectionObserver } from 'usehooks-ts'
 import LoadingSpinner from '../common/LoadingSpinner'
-import { useBids } from '@reservoir0x/reservoir-kit-ui'
+import { useBids } from '@sh-reservoir0x/reservoir-kit-ui'
 import Link from 'next/link'
 import { MutatorCallback } from 'swr'
 import { useMarketplaceChain, useTimeSince } from 'hooks'
@@ -227,6 +227,7 @@ const OfferTableRow: FC<OfferTableRowProps> = ({ offer, isOwner, mutate }) => {
                   decimals={offer?.price?.currency?.decimals}
                   textStyle="subtitle3"
                   logoHeight={14}
+                  maximumFractionDigits={2}
                 />
               </Flex>
             }
@@ -238,12 +239,13 @@ const OfferTableRow: FC<OfferTableRowProps> = ({ offer, isOwner, mutate }) => {
                 decimals={offer?.price?.currency?.decimals}
                 textStyle="subtitle2"
                 logoHeight={14}
+                maximumFractionDigits={2}
               />
             </Flex>
           </Tooltip>
         </Flex>
         <Flex justify="between" align="center" css={{ width: '100%' }}>
-          <a href={`https://${offer?.source?.domain}`} target="_blank">
+          {/* <a href={`https://${offer?.source?.domain}`} target="_blank">
             <Flex align="center" css={{ gap: '$2' }}>
               <img
                 width="20px"
@@ -253,7 +255,7 @@ const OfferTableRow: FC<OfferTableRowProps> = ({ offer, isOwner, mutate }) => {
               />
               <Text style="subtitle2">{expiration}</Text>
             </Flex>
-          </a>
+          </a> */}
 
           {isOwner ? (
             <CancelBid
@@ -367,6 +369,7 @@ const OfferTableRow: FC<OfferTableRowProps> = ({ offer, isOwner, mutate }) => {
                 decimals={offer?.price?.currency?.decimals}
                 textStyle="subtitle3"
                 logoHeight={14}
+                maximumFractionDigits={2}
               />
             </Flex>
           }
@@ -378,6 +381,7 @@ const OfferTableRow: FC<OfferTableRowProps> = ({ offer, isOwner, mutate }) => {
               decimals={offer?.price?.currency?.decimals}
               textStyle="subtitle1"
               logoHeight={14}
+              maximumFractionDigits={2}
             />
           </Flex>
         </Tooltip>
@@ -391,7 +395,7 @@ const OfferTableRow: FC<OfferTableRowProps> = ({ offer, isOwner, mutate }) => {
         <Text style="subtitle2">{expiration}</Text>
       </TableCell>
       <TableCell>
-        <Flex align="center" css={{ gap: '$2' }}>
+        {/* <Flex align="center" css={{ gap: '$2' }}>
           <img
             width="20px"
             height="20px"
@@ -406,7 +410,7 @@ const OfferTableRow: FC<OfferTableRowProps> = ({ offer, isOwner, mutate }) => {
           >
             {offer?.source?.name as string}
           </Anchor>
-        </Flex>
+        </Flex> */}
       </TableCell>
       <TableCell>
         <Flex justify="end">
@@ -468,7 +472,7 @@ const headings = [
   'Offer Amount',
   'Quantity',
   'Expiration',
-  'Marketplace',
+  // 'Marketplace',
   '',
 ]
 

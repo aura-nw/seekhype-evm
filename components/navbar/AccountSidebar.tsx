@@ -23,7 +23,6 @@ import CopyText from 'components/common/CopyText'
 import Link from 'next/link'
 import Wallet from './Wallet'
 import { useRouter } from 'next/router'
-import { AvatarFallback } from '@radix-ui/react-avatar'
 
 export const AccountSidebar: FC = () => {
   const { address } = useAccount()
@@ -35,6 +34,13 @@ export const AccountSidebar: FC = () => {
     shortName: shortEnsName,
   } = useENSResolver(address)
   const [open, setOpen] = useState(false)
+
+  const openAurascan = () => {
+    window.open(
+      `${process.env.NEXT_PUBLIC_AURASCAN_URL}/account/${address}`,
+      '_blank'
+    )
+  }
 
   useEffect(() => {
     setOpen(false)
@@ -50,16 +56,7 @@ export const AccountSidebar: FC = () => {
       color="gray3"
     >
       {ensAvatar ? (
-        <Avatar
-          size="medium"
-          src={ensAvatar}
-          fallback={
-            <Jazzicon
-              diameter={44}
-              seed={jsNumberForAddress(address as string)}
-            />
-          }
-        />
+        <Avatar size="medium" src={ensAvatar} />
       ) : (
         <Jazzicon diameter={44} seed={jsNumberForAddress(address as string)} />
       )}
@@ -132,6 +129,13 @@ export const AccountSidebar: FC = () => {
                         seed={jsNumberForAddress(address as string)}
                       />
                     )}
+                    <Text
+                      style="body1"
+                      css={{ cursor: 'pointer' }}
+                      onClick={openAurascan}
+                    >
+                      {shortEnsName ? shortEnsName : shortAddress}
+                    </Text>
                     <CopyText
                       text={address || ''}
                       css={{ width: 'max-content' }}
@@ -145,9 +149,6 @@ export const AccountSidebar: FC = () => {
                             cursor: 'pointer',
                           }}
                         >
-                          <Text style="body1">
-                            {shortEnsName ? shortEnsName : shortAddress}
-                          </Text>
                           {!shortEnsName ? (
                             <FontAwesomeIcon
                               icon={faCopy}
@@ -193,7 +194,7 @@ export const AccountSidebar: FC = () => {
                         }}
                       >
                         <FontAwesomeIcon icon={faStore} />
-                        <Text style="body1">My Items</Text>
+                        <Text style="body1">Owned items</Text>
                       </Flex>
                     </Link>
                     <Link

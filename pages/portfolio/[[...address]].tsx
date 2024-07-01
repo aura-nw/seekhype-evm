@@ -11,7 +11,7 @@ import {
   AcceptBidStep,
   useUserCollections,
   useUserTokens,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import { useENSResolver, useMounted } from '../../hooks'
 import { TokenTable, TokenTableRef } from 'components/portfolio/TokenTable'
 import { ConnectWalletButton } from 'components/ConnectWalletButton'
@@ -33,7 +33,7 @@ import PortfolioSortDropdown, {
 import { ActivityFilters } from 'components/common/ActivityFilters'
 import { MobileActivityFilters } from 'components/common/MobileActivityFilters'
 import { UserActivityTable } from 'components/portfolio/UserActivityTable'
-import { useCollectionActivity } from '@reservoir0x/reservoir-kit-ui'
+import { useCollectionActivity } from '@sh-reservoir0x/reservoir-kit-ui'
 import { useRouter } from 'next/router'
 import { ItemView, ViewToggle } from 'components/portfolio/ViewToggle'
 import { ToastContext } from 'context/ToastContextProvider'
@@ -62,11 +62,11 @@ const IndexPage: NextPage = () => {
   const [itemView, setItemView] = useState<ItemView>('list')
 
   const [activityTypes, setActivityTypes] = useState<ActivityTypes>(['sale'])
-  const [activityFiltersOpen, setActivityFiltersOpen] = useState(true)
+  const [activityFiltersOpen, setActivityFiltersOpen] = useState(false)
   const [tokenFiltersOpen, setTokenFiltersOpen] = useState(false)
   const [hideSpam, setHideSpam] = useState<boolean>(true)
   const [filterCollection, setFilterCollection] = useState<string | undefined>(
-    undefined,
+    undefined
   )
   const [sortByType, setSortByType] =
     useState<PortfolioSortingOption>('acquiredAt')
@@ -74,7 +74,8 @@ const IndexPage: NextPage = () => {
   const isMounted = useMounted()
   const { addToast } = useContext(ToastContext)
   const isOwner =
-    !router.query.address || router.query.address[0] === accountAddress
+    !router.query.address ||
+    router.query.address[0]?.toLowerCase() === accountAddress?.toLowerCase()
 
   const {
     avatar: ensAvatar,
@@ -115,7 +116,7 @@ const IndexPage: NextPage = () => {
           tokenId: item.token?.tokenId as string,
           collectionId: item.token?.collection?.id as string,
         })),
-    [selectedItems],
+    [selectedItems]
   )
 
   const tokenTableRef = useRef<TokenTableRef>(null)
@@ -212,16 +213,7 @@ const IndexPage: NextPage = () => {
                   >
                     <Flex align="center">
                       {ensAvatar ? (
-                        <Avatar
-                          size="xxl"
-                          src={ensAvatar}
-                          fallback={
-                            <Jazzicon
-                              diameter={64}
-                              seed={jsNumberForAddress(address as string)}
-                            />
-                          }
-                        />
+                        <Avatar size="xxl" src={ensAvatar} />
                       ) : (
                         <Jazzicon
                           diameter={64}
@@ -316,12 +308,12 @@ const IndexPage: NextPage = () => {
                         >
                           {isSmallDevice && (
                             <Flex justify="between" css={{ gap: '$3' }}>
-                              <PortfolioSortDropdown
+                              {/* <PortfolioSortDropdown
                                 option={sortByType}
                                 onOptionSelected={(option) => {
                                   setSortByType(option)
                                 }}
-                              />
+                              /> */}
                               <ViewToggle
                                 itemView={itemView}
                                 setItemView={setItemView}
@@ -343,12 +335,12 @@ const IndexPage: NextPage = () => {
                                 justify="between"
                                 css={{ gap: '$3' }}
                               >
-                                <PortfolioSortDropdown
+                                {/* <PortfolioSortDropdown
                                   option={sortByType}
                                   onOptionSelected={(option) => {
                                     setSortByType(option)
                                   }}
-                                />
+                                /> */}
                                 <ViewToggle
                                   itemView={itemView}
                                   setItemView={setItemView}

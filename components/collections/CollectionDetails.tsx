@@ -3,11 +3,11 @@ import {
   useCollections,
   useDynamicTokens,
   useMarketplaceConfigs,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import CollectionActions from 'components/collections/CollectionActions'
 import TokenCard from 'components/collections/TokenCard'
-import { Box, Flex, Text, Tooltip } from 'components/primitives'
-import { useChainCurrency } from 'hooks'
+import { Box, Flex, FormatCryptoCurrency, Text, Tooltip } from 'components/primitives'
+import { useChainCurrency, useMarketplaceChain } from 'hooks'
 import { useRouter } from 'next/router'
 import { FC, useState, useRef, useEffect, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -15,6 +15,7 @@ import { styled } from 'stitches.config'
 import optimizeImage from 'utils/optimizeImage'
 import { truncateAddress } from 'utils/truncate'
 import supportedChains, { DefaultChain } from 'utils/chains'
+import Link from 'next/link'
 
 const StyledImage = styled('img', {})
 
@@ -45,6 +46,9 @@ export const CollectionDetails: FC<Props> = ({
   const router = useRouter()
   const [descriptionExpanded, setDescriptionExpanded] = useState(false)
   const [isOverflowed, setIsOverflowed] = useState(false)
+  const marketplaceChain = useMarketplaceChain()
+  const blockExplorerBaseUrl =
+    marketplaceChain?.blockExplorers?.default?.url || 'https://etherscan.io'
 
   const chainCurrency = useChainCurrency()
 
@@ -72,7 +76,7 @@ export const CollectionDetails: FC<Props> = ({
   const reservoirMarketplace = useMemo(
     () =>
       marketplaceConfigs?.marketplaces?.find(
-        (marketplace) => marketplace?.orderbook === 'reservoir'
+        (marketplace: any) => marketplace?.orderbook === 'reservoir'
       ),
     [marketplaceConfigs]
   )
@@ -193,7 +197,7 @@ export const CollectionDetails: FC<Props> = ({
           {[
             {
               label: 'Contract',
-              value: truncateAddress(collection?.primaryContract || ''),
+              value: collection?.primaryContract || '',
             },
             { label: 'Token Standard', value: contractKind },
             { label: 'Chain', value: chainName },
@@ -227,22 +231,44 @@ export const CollectionDetails: FC<Props> = ({
               ),
             },
             { label: 'Total Supply', value: collection?.tokenCount },
-          ].map((data) => (
-            <Flex
-              css={{
-                gap: '$4',
-                justifyContent: 'space-between',
-                mb: '$2',
-              }}
-            >
-              <Text style="body1" color="subtle">
-                {data.label}
-              </Text>
-              <Text style="body1" css={{ fontWeight: 600 }}>
-                {data.value}
-              </Text>
-            </Flex>
-          ))}
+          ].map((data) =>
+            data?.label === 'Contract' ? (
+              <Flex
+                css={{
+                  gap: '$4',
+                  justifyContent: 'space-between',
+                  mb: '$2',
+                }}
+              >
+                <Text style="body1" color="subtle">
+                  {data.label}
+                </Text>
+                <Link
+                  href={`${blockExplorerBaseUrl}/evm-contracts/${data?.value}`}
+                  target="_blank"
+                >
+                  <Text style="body1" css={{ fontWeight: 600 }}>
+                    {truncateAddress(data?.value?.toString() || '')}
+                  </Text>
+                </Link>
+              </Flex>
+            ) : (
+              <Flex
+                css={{
+                  gap: '$4',
+                  justifyContent: 'space-between',
+                  mb: '$2',
+                }}
+              >
+                <Text style="body1" color="subtle">
+                  {data.label}
+                </Text>
+                <Text style="body1" css={{ fontWeight: 600 }}>
+                  {data.value}
+                </Text>
+              </Flex>
+            )
+          )}
         </Box>
       </Box>
       <Box
@@ -258,31 +284,48 @@ export const CollectionDetails: FC<Props> = ({
           {[
             {
               name: 'Floor',
-              value: collection?.floorAsk?.price?.amount?.decimal
-                ? `${collection?.floorAsk?.price?.amount?.decimal} ${collection?.floorAsk?.price?.currency?.symbol}`
-                : '-',
+              _value: (
+                <FormatCryptoCurrency
+                  amount={collection?.floorAsk?.price?.amount?.raw}
+                  decimals={collection?.floorAsk?.price?.currency?.decimals}
+                  logoHeight={18}
+                  textStyle="h5"
+                  maximumFractionDigits={2} />
+              ),
+              get value() {
+                return this._value
+              },
+              set value(value) {
+                this._value = value
+              },
             },
-            {
-              name: 'Top Bid',
-              value: collection?.topBid?.price?.amount?.decimal
-                ? `${collection?.topBid?.price?.amount?.decimal || 0} ${
-                    collection?.topBid?.price?.currency?.symbol
-                  }`
-                : '-',
-            },
-            {
-              name: '24h Volume',
-              value: `${Number(
-                collection?.volume?.['1day']?.toFixed(2)
-              ).toLocaleString()} ${chainCurrency.symbol}`,
-            },
+            // {
+            //   name: 'Floor',
+            //   value: collection?.floorAsk?.price?.amount?.decimal
+            //     ? `${collection?.floorAsk?.price?.amount?.decimal} ${collection?.floorAsk?.price?.currency?.symbol}`
+            //     : '-',
+            // },
+            // {
+            //   name: 'Top Bid',
+            //   value: collection?.topBid?.price?.amount?.decimal
+            //     ? `${collection?.topBid?.price?.amount?.decimal || 0} ${
+            //         collection?.topBid?.price?.currency?.symbol
+            //       }`
+            //     : '-',
+            // },
+            // {
+            //   name: '24h Volume',
+            //   value: `${Number(
+            //     collection?.volume?.['1day']?.toFixed(2)
+            //   ).toLocaleString()} ${chainCurrency.symbol}`,
+            // },
 
-            {
-              name: '24h Sales',
-              value: Number(
-                `${collection?.salesCount?.['1day'] || 0}`
-              ).toLocaleString(),
-            },
+            // {
+            //   name: '24h Sales',
+            //   value: Number(
+            //     `${collection?.salesCount?.['1day'] || 0}`
+            //   ).toLocaleString(),
+            // },
           ].map((stat) => (
             <Box
               css={{
@@ -305,7 +348,7 @@ export const CollectionDetails: FC<Props> = ({
           ))}
         </ItemGrid>
 
-        <Text style="h7" as="h5" css={{ mb: '$3', mt: '$5' }}>
+        {/* <Text style="h7" as="h5" css={{ mb: '$3', mt: '$5' }}>
           Rare Tokens
         </Text>
         {rareTokens.length > 0 ? (
@@ -321,7 +364,7 @@ export const CollectionDetails: FC<Props> = ({
           </ItemGrid>
         ) : (
           <Text>No rare tokens</Text>
-        )}
+        )} */}
 
         <Text style="h7" as="h5" css={{ mb: '$3', mt: '$5' }}>
           Floor Tokens

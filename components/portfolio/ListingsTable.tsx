@@ -14,7 +14,7 @@ import {
 } from '../primitives'
 import { useIntersectionObserver } from 'usehooks-ts'
 import LoadingSpinner from '../common/LoadingSpinner'
-import { useListings } from '@reservoir0x/reservoir-kit-ui'
+import { useListings } from '@sh-reservoir0x/reservoir-kit-ui'
 import Link from 'next/link'
 import { MutatorCallback } from 'swr'
 import { useMarketplaceChain, useTimeSince } from 'hooks'
@@ -44,6 +44,7 @@ export const ListingsTable: FC<Props> = ({ address, isOwner }) => {
     maker: address,
     includeCriteriaMetadata: true,
     includeRawData: true,
+    sortBy: 'createdAt'
   }
   const { chain } = useContext(ChainContext)
 
@@ -216,10 +217,11 @@ const ListingTableRow: FC<ListingTableRowProps> = ({
             address={listing?.price?.currency?.contract}
             textStyle="subtitle2"
             logoHeight={14}
+            maximumFractionDigits={2}
           />
         </Flex>
         <Flex justify="between" align="center" css={{ width: '100%' }}>
-          <a href={`https://${listing?.source?.domain}`} target="_blank">
+          {/* <a href={`https://${listing?.source?.domain}`} target="_blank">
             <Flex align="center" css={{ gap: '$2' }}>
               <img
                 width="20px"
@@ -229,7 +231,7 @@ const ListingTableRow: FC<ListingTableRowProps> = ({
               />
               <Text style="subtitle2">{expiration}</Text>
             </Flex>
-          </a>
+          </a> */}
           {isOwner ? (
             <CancelListing
               listingId={listing?.id as string}
@@ -341,16 +343,17 @@ const ListingTableRow: FC<ListingTableRowProps> = ({
           address={listing?.price?.currency?.contract}
           textStyle="subtitle2"
           logoHeight={14}
+          maximumFractionDigits={2}
         />
-      </TableCell>
-      <TableCell>
-        <Text style="subtitle2">{formatNumber(listing.quantityRemaining)}</Text>
       </TableCell>
       <TableCell>
         <Text style="subtitle2">{expiration}</Text>
       </TableCell>
       <TableCell>
-        <Flex align="center" css={{ gap: '$2' }}>
+        {/* <Text style="subtitle2">{formatNumber(listing.quantityRemaining)}</Text> */}
+      </TableCell>
+      <TableCell>
+        {/* <Flex align="center" css={{ gap: '$2' }}>
           <img
             width="20px"
             height="20px"
@@ -365,7 +368,7 @@ const ListingTableRow: FC<ListingTableRowProps> = ({
           >
             {listing?.source?.name as string}
           </Anchor>
-        </Flex>
+        </Flex> */}
       </TableCell>
       <TableCell>
         <Flex justify="end">
@@ -438,9 +441,9 @@ const ListingTableRow: FC<ListingTableRowProps> = ({
 const headings = [
   'Items',
   'Listed Price',
-  'Quantity',
-  'Expiration',
-  'Marketplace',
+  // 'Quantity',
+  // 'Expiration',
+  // 'Marketplace',
   '',
 ]
 

@@ -17,8 +17,10 @@ import { FullscreenModal } from 'components/common/FullscreenModal'
 import { useENSResolver, useMarketplaceChain } from 'hooks'
 import ThemeSwitcher from 'components/navbar/ThemeSwitcher'
 import Wallet from 'components/navbar/Wallet'
+import { useTheme } from 'next-themes'
 
 const HamburgerMenu = () => {
+  const { theme } = useTheme()
   const { address, isConnected } = useAccount()
   const {
     avatar: ensAvatar,
@@ -27,6 +29,12 @@ const HamburgerMenu = () => {
   } = useENSResolver(address)
   const { disconnect } = useDisconnect()
   const { routePrefix } = useMarketplaceChain()
+
+  const logoSrc =
+  theme === 'dark'
+    ? '/sh-evm-logo-white.svg'
+    : '/sh-evm-logo.svg'
+
 
   const trigger = (
     <Button
@@ -59,12 +67,11 @@ const HamburgerMenu = () => {
           justify="between"
         >
           <Link href="/">
-            <Box css={{ width: 46, cursor: 'pointer' }}>
-              <Image
-                src="/reservoirLogo.svg"
-                width={36}
-                height={36}
-                alt="Reservoir"
+            <Box css={{ width: 124, cursor: 'pointer' }}>
+              <img
+                src={logoSrc}
+                style={{width: '100%'}}
+                alt="SeekHypeEVM"
               />
             </Box>
           </Link>
@@ -108,16 +115,7 @@ const HamburgerMenu = () => {
               >
                 <Flex css={{ alignItems: 'center' }}>
                   {ensAvatar ? (
-                    <Avatar
-                      size="medium"
-                      src={ensAvatar}
-                      fallback={
-                        <Jazzicon
-                          diameter={36}
-                          seed={jsNumberForAddress(address as string)}
-                        />
-                      }
-                    />
+                    <Avatar size="medium" src={ensAvatar} />
                   ) : (
                     <Jazzicon
                       diameter={36}
@@ -143,7 +141,7 @@ const HamburgerMenu = () => {
                 Explore
               </Text>
             </Link>
-            <Link href="/ethereum/collections/trending" legacyBehavior>
+            <Link href={`/${routePrefix}/collections/trending`} legacyBehavior>
               <Text
                 style="subtitle1"
                 css={{
@@ -153,11 +151,11 @@ const HamburgerMenu = () => {
                   pt: '24px',
                 }}
               >
-                Trending Collections
+                Collections
               </Text>
             </Link>
 
-            <Link href="/ethereum/mints/trending" legacyBehavior>
+            <Link href={`/${routePrefix}/mints/trending`} legacyBehavior>
               <Text
                 style="subtitle1"
                 css={{
@@ -167,11 +165,12 @@ const HamburgerMenu = () => {
                   pt: '24px',
                 }}
               >
-                Trending Mints
+                Mints
               </Text>
             </Link>
 
-            <Anchor
+
+            {/* <Anchor
               href="https://docs.reservoir.tools/docs"
               target="_blank"
               css={{
@@ -183,7 +182,7 @@ const HamburgerMenu = () => {
               }}
             >
               <Text style="subtitle1">Developers</Text>
-            </Anchor>
+            </Anchor> */}
             <Link href="/portfolio" legacyBehavior>
               <Flex
                 direction="column"

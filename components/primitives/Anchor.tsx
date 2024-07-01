@@ -15,9 +15,9 @@ export const AnchorStyle = {
   variants: {
     color: {
       primary: {
-        color: '$primary11',
+        color: '$button-bg-bg-primary-active',
         '&:hover': {
-          color: '$primary10',
+          color: '$button-bg-bg-primary-hover',
         },
       },
       gray: {

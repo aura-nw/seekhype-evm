@@ -6,7 +6,7 @@ import { cloneElement, ComponentProps, FC, ReactNode, useContext } from 'react'
 import { useAccount, useWalletClient } from 'wagmi'
 import { CSS } from '@stitches/react'
 import { SWRResponse } from 'swr'
-import { EditBidModal, EditBidStep } from '@reservoir0x/reservoir-kit-ui'
+import { EditBidModal, EditBidStep } from '@sh-reservoir0x/reservoir-kit-ui'
 
 type Props = {
   bidId?: string

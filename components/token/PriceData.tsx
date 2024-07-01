@@ -1,4 +1,4 @@
-import { useTokens } from '@reservoir0x/reservoir-kit-ui'
+import { useTokens } from '@sh-reservoir0x/reservoir-kit-ui'
 import {
   Flex,
   FormatCryptoCurrency,
@@ -8,12 +8,16 @@ import {
 import { useMarketplaceChain } from 'hooks'
 import { FC } from 'react'
 import { formatDollar } from 'utils/numbers'
+import { useAccount } from 'wagmi'
 
 type Props = {
   token: ReturnType<typeof useTokens>['data'][0] | null
+  usdPrice?: number
 }
 
-export const PriceData: FC<Props> = ({ token }) => {
+export const PriceData: FC<Props> = ({ token, usdPrice }) => {
+  const { address } = useAccount()
+  // const { proxyApi } = useMarketplaceChain()
   const { proxyApi } = useMarketplaceChain()
   const listSourceName = token?.market?.floorAsk?.source?.name as
     | string
@@ -32,6 +36,7 @@ export const PriceData: FC<Props> = ({ token }) => {
   const listSourceLogo = `${
     process.env.NEXT_PUBLIC_PROXY_URL
   }${proxyApi}/redirect/sources/${listSourceDomain || listSourceName}/logo/v2`
+  // const listSourceLogo = `https://zora.co/assets/favicon/favicon.ico`
 
   const offerSourceLogo = `${
     process.env.NEXT_PUBLIC_PROXY_URL
@@ -49,6 +54,8 @@ export const PriceData: FC<Props> = ({ token }) => {
     offerSourceDomain || offerSourceName
   }/tokens/${token?.token?.contract}:${token?.token?.tokenId}/link/v2`
 
+  const isValidListing = token?.market?.floorAsk?.maker === token?.token?.owner
+
   return (
     <Flex css={{ gap: '$6', pt: '$4', pb: '$5' }}>
       <Flex direction="column" align="start" css={{ gap: '$1' }}>
@@ -61,22 +68,28 @@ export const PriceData: FC<Props> = ({ token }) => {
           }}
         >
           <FormatCryptoCurrency
-            amount={token?.market?.floorAsk?.price?.amount?.decimal}
+            amount={
+              isValidListing
+                ? token?.market?.floorAsk?.price?.amount?.raw
+                : undefined
+            }
             address={token?.market?.floorAsk?.price?.currency?.contract}
             decimals={token?.market?.floorAsk?.price?.currency?.decimals}
             textStyle="h4"
             logoHeight={20}
-            maximumFractionDigits={4}
+            maximumFractionDigits={2}
           />
-          {token?.market?.floorAsk?.price?.amount?.usd ? (
+          {usdPrice ? (
             <Text style="body3" css={{ color: '$gray11' }} ellipsify>
               {formatDollar(
-                token?.market?.floorAsk?.price?.amount?.usd as number
+                (isValidListing
+                  ? token?.market?.floorAsk?.price?.amount?.decimal || 0
+                  : 0) * usdPrice
               )}
             </Text>
           ) : null}
         </Flex>
-        {listSourceName && (
+        {/* {listSourceName && (
           <a
             href={listSourceRedirect}
             target="_blank"
@@ -96,9 +109,9 @@ export const PriceData: FC<Props> = ({ token }) => {
               </Text>
             </Flex>
           </a>
-        )}
+        )} */}
       </Flex>
-      <Flex direction="column" align="start" css={{ gap: '$1' }}>
+      {/* <Flex direction="column" align="start" css={{ gap: '$1' }}>
         <Text style="subtitle2">Top Offer</Text>
         <Flex
           align="center"
@@ -123,6 +136,7 @@ export const PriceData: FC<Props> = ({ token }) => {
                   decimals={token?.market?.topBid?.price?.currency?.decimals}
                   textStyle="subtitle3"
                   logoHeight={14}
+                  maximumFractionDigits={2}
                 />
               </Flex>
             }
@@ -134,6 +148,7 @@ export const PriceData: FC<Props> = ({ token }) => {
                 decimals={token?.market?.topBid?.price?.currency?.decimals}
                 textStyle="h4"
                 logoHeight={20}
+                maximumFractionDigits={2}
               />
             </Flex>
           </Tooltip>
@@ -165,7 +180,7 @@ export const PriceData: FC<Props> = ({ token }) => {
             </Flex>
           </a>
         )}
-      </Flex>
+      </Flex> */}
     </Flex>
   )
 }

@@ -5,7 +5,7 @@ import {
   faRefresh,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useCollections } from '@reservoir0x/reservoir-kit-ui'
+import { useCollections } from '@sh-reservoir0x/reservoir-kit-ui'
 import { styled } from '../../stitches.config'
 import { Box, Flex } from 'components/primitives'
 import { ComponentPropsWithoutRef, FC, useContext, useState } from 'react'
@@ -58,11 +58,12 @@ const CollectionActions: FC<CollectionActionsProps> = ({ collection }) => {
   const { theme } = useTheme()
   const etherscanImage = (
     <img
-      src={
-        isMounted && theme === 'dark'
-          ? '/icons/etherscan-logo-light-circle.svg'
-          : '/icons/etherscan-logo-circle.svg'
-      }
+      // src={
+      //   isMounted && theme === 'dark'
+      //     ? '/icons/etherscan-logo-light-circle.svg'
+      //     : '/icons/etherscan-logo-circle.svg'
+      // }
+      src="https://aurascan.io/assets/images/logo/title-logo.png"
       alt={marketplaceChain.blockExplorers?.default.name || 'Etherscan'}
       style={{
         height: 16,
@@ -143,7 +144,7 @@ const CollectionActions: FC<CollectionActionsProps> = ({ collection }) => {
                 : `This collection was recently refreshed. Please try again later.`,
             })
             setIsRefreshing(false)
-            throw e
+            // throw e
           })
       }}
     >

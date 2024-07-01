@@ -9,13 +9,14 @@ import {
   TokenMedia,
   useAttributes,
   useBids,
+  useCoinConversion,
   useCollections,
   useDynamicTokens,
   useListings,
   useTokenActivity,
   useUserTokens,
-} from '@reservoir0x/reservoir-kit-ui'
-import { paths } from '@reservoir0x/reservoir-sdk'
+} from '@sh-reservoir0x/reservoir-kit-ui'
+import { paths } from '@sh-reservoir0x/reservoir-sdk'
 import { ActivityFilters } from 'components/token/ActivityFilters'
 import { spin } from 'components/common/LoadingSpinner'
 import { MobileActivityFilters } from 'components/common/MobileActivityFilters'
@@ -49,6 +50,7 @@ import { useAccount } from 'wagmi'
 import { Head } from 'components/Head'
 import { OffersTable } from 'components/token/OffersTable'
 import { ListingsTable } from 'components/token/ListingsTable'
+import { parseUnits } from 'viem'
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 
@@ -79,6 +81,8 @@ const IndexPage: NextPage<Props> = ({ assetId, ssr }) => {
 
   const { proxyApi } = useMarketplaceChain()
   const contract = collectionId ? collectionId?.split(':')[0] : undefined
+  const coinConversion = useCoinConversion('USD')
+  const usdPrice = coinConversion.length > 0 ? coinConversion[0].price : 0
 
   const { data: tokens, mutate } = useDynamicTokens(
     {
@@ -486,7 +490,7 @@ const IndexPage: NextPage<Props> = ({ assetId, ssr }) => {
                     })
 
                     setIsRefreshing(false)
-                    throw e
+                    // throw e
                   })
               }}
               disabled={isRefreshing}
@@ -552,7 +556,7 @@ const IndexPage: NextPage<Props> = ({ assetId, ssr }) => {
                 collection={collection}
                 collectionAttributes={attributesData?.data}
               />
-              <PriceData token={token} />
+              <PriceData token={token} usdPrice={usdPrice} />
               {isMounted && (
                 <TokenActions
                   token={token}
@@ -646,6 +650,7 @@ const IndexPage: NextPage<Props> = ({ assetId, ssr }) => {
                     address={account.address}
                     is1155={is1155}
                     isOwner={isOwner}
+                    usdPrice={usdPrice}
                   />
                 </TabsContent>
                 <TabsContent value="offers" css={{ mr: -15, width: '100%' }}>
@@ -654,6 +659,7 @@ const IndexPage: NextPage<Props> = ({ assetId, ssr }) => {
                     address={account.address}
                     is1155={is1155}
                     isOwner={isOwner}
+                    royalty={collection?.royalties?.bps || 0}
                   />
                 </TabsContent>
               </Tabs.Root>

@@ -1,4 +1,4 @@
-import { AcceptBidModal, AcceptBidStep } from '@reservoir0x/reservoir-kit-ui'
+import { AcceptBidModal, AcceptBidStep } from '@sh-reservoir0x/reservoir-kit-ui'
 import {
   cloneElement,
   ComponentProps,
@@ -24,6 +24,7 @@ type Props = {
   buttonCss?: CSS
   buttonChildren?: ReactNode
   buttonProps?: ComponentProps<typeof Button>
+  collectionRoyalty?: number
   mutate?: SWRResponse['mutate']
 }
 
@@ -36,6 +37,7 @@ const AcceptBid: FC<Props> = ({
   buttonCss,
   buttonChildren,
   buttonProps,
+  collectionRoyalty,
   mutate,
 }) => {
   const { isDisconnected } = useAccount()
@@ -59,6 +61,7 @@ const AcceptBid: FC<Props> = ({
             collectionId: collectionId,
             tokenId: tokenId,
             bidIds: bidId ? [bidId] : undefined,
+            royalty: collectionRoyalty,
           },
         ]
       : []

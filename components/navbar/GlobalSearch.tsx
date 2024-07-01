@@ -36,6 +36,7 @@ import optimizeImage from 'utils/optimizeImage'
 import { SearchChainSwitcher } from './SearchChainSwitcher'
 import { ChainContext } from 'context/ChainContextProvider'
 import titleCase from 'utils/titleCase'
+import CryptoCurrencyIcon from 'components/primitives/CryptoCurrencyIcon'
 
 type Props = {
   collection: SearchCollection
@@ -91,7 +92,7 @@ const CollectionItem: FC<Props> = ({ collection, handleSelectResult }) => {
             />
           </Flex>
           <Flex align="center" css={{ gap: '$1' }}>
-            <Box css={{ height: 12, minWidth: 'max-content' }}>
+            {/* <Box css={{ height: 12, minWidth: 'max-content' }}>
               <img
                 src={
                   theme === 'dark'
@@ -100,7 +101,7 @@ const CollectionItem: FC<Props> = ({ collection, handleSelectResult }) => {
                 }
                 style={{ height: 12 }}
               />
-            </Box>
+            </Box> */}
             {tokenCount && (
               <Text style="subtitle3" color="subtle">
                 {tokenCount} items
@@ -109,14 +110,15 @@ const CollectionItem: FC<Props> = ({ collection, handleSelectResult }) => {
           </Flex>
         </Flex>
         {collection.volumeCurrencySymbol && (
-          <Flex css={{ ml: 'auto', flexShrink: 0, gap: '$1' }}>
+          <Flex align={'center'} css={{ ml: 'auto', flexShrink: 0, gap: '$1' }}>
+            <CryptoCurrencyIcon css={{ height: 12 }} address='' />
             <FormatCrypto
               textStyle="subtitle2"
               amount={collection.allTimeVolume}
               decimals={collection.volumeCurrencyDecimals}
               maximumFractionDigits={2}
             />
-            {collection.volumeCurrencySymbol}
+            {/* {collection.volumeCurrencySymbol} */}
           </Flex>
         )}
       </Flex>
@@ -221,7 +223,7 @@ const GlobalSearch = forwardRef<
       setFallbackResults(res.fallbackResults)
       setSearching(false)
     }
-    if (debouncedSearch.length >= 2) {
+    if (debouncedSearch.length >= 1) {
       getSearchResults()
     } else {
       setResults([])

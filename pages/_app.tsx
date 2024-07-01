@@ -11,6 +11,7 @@ import { ThemeProvider, useTheme } from 'next-themes'
 import { darkTheme, globalReset } from 'stitches.config'
 import '@rainbow-me/rainbowkit/styles.css'
 import {
+  DisclaimerComponent,
   RainbowKitProvider,
   getDefaultConfig,
   darkTheme as rainbowDarkTheme,
@@ -23,7 +24,7 @@ import {
   lightTheme as reservoirLightTheme,
   ReservoirKitTheme,
   CartProvider,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import { FC, useContext, useEffect, useState } from 'react'
 import { HotkeysProvider } from 'react-hotkeys-hook'
 import ToastContextProvider from 'context/ToastContextProvider'
@@ -39,7 +40,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { WagmiProvider, http } from 'wagmi'
 import { chainIdToAlchemyNetworkMap } from 'utils/chainIdToAlchemyNetworkMap'
 import { _transports } from '@rainbow-me/rainbowkit/dist/config/getDefaultConfig'
-import { Chain, mainnet } from 'viem/chains'
+import { Chain, evmosTestnet, mainnet } from 'viem/chains'
 
 //CONFIGURABLE: Use nextjs to load your own custom font: https://nextjs.org/docs/basic-features/font-optimization
 const inter = Inter({
@@ -61,16 +62,20 @@ const ALCHEMY_API_KEY = process.env.NEXT_PUBLIC_ALCHEMY_API_KEY
 const wagmiConfig = getDefaultConfig({
   appName: 'Reservoir NFT Explorer',
   projectId: WALLET_CONNECT_PROJECT_ID,
-  chains: (supportedChains.length === 0 ? [mainnet] : supportedChains) as [
+  // chains: (supportedChains.length === 0 ? [mainnet] : supportedChains) as [
+  //   Chain,
+  //   ...Chain[]
+  // ],
+  chains: (supportedChains.length === 0 ? [evmosTestnet] : supportedChains) as [
     Chain,
-    ...Chain[],
+    ...Chain[]
   ],
   ssr: true,
   transports: supportedChains.reduce((transportsConfig: _transports, chain) => {
     const network = chainIdToAlchemyNetworkMap[chain.id]
     if (network && ALCHEMY_API_KEY) {
       transportsConfig[chain.id] = http(
-        `https://${network}.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+        `https://${network}.g.alchemy.com/v2/${ALCHEMY_API_KEY}`
       )
     } else {
       transportsConfig[chain.id] = http() // Fallback to default HTTP transport
@@ -85,8 +90,8 @@ const queryClient = new QueryClient()
 const reservoirKitThemeOverrides = {
   headlineFont: inter.style.fontFamily,
   font: inter.style.fontFamily,
-  primaryColor: '#6E56CB',
-  primaryHoverColor: '#644fc1',
+  primaryColor: '#ff0192',
+  primaryHoverColor: '#e80185',
 }
 
 function AppWrapper(props: AppProps & { baseUrl: string }) {
@@ -141,14 +146,14 @@ function MyApp({
       setRainbowKitTheme(
         rainbowDarkTheme({
           borderRadius: 'small',
-        }),
+        })
       )
     } else {
       setReservoirKitTheme(reservoirLightTheme(reservoirKitThemeOverrides))
       setRainbowKitTheme(
         rainbowLightTheme({
           borderRadius: 'small',
-        }),
+        })
       )
     }
   }, [theme])
@@ -164,6 +169,8 @@ function MyApp({
       source = url.host
     } catch (e) {}
   }
+
+  const Disclaimer: DisclaimerComponent = ({ Text, Link }) => <div></div>
 
   return (
     <HotkeysProvider>
@@ -203,21 +210,29 @@ function MyApp({
                   checkPollingInterval: checkPollingInterval,
                   paymentTokens: chainPaymentTokensMap[id],
                 }
-              },
+              }
             ),
             logLevel: 4,
             source: source,
             normalizeRoyalties: NORMALIZE_ROYALTIES,
             //CONFIGURABLE: Set your marketplace fee and recipient, (fee is in BPS)
             // Note that this impacts orders created on your marketplace (offers/listings)
-            // marketplaceFees: ['0x03508bB71268BBA25ECaCC8F620e01866650532c:250'],
+            marketplaceFees: ['0x03508bB71268BBA25ECaCC8F620e01866650532c:250'],
+            disablePoweredByReservoir: true
           }}
           theme={reservoirKitTheme}
         >
           <CartProvider feesOnTopUsd={feesOnTop}>
             <WebsocketContextProvider>
               <Tooltip.Provider>
-                <RainbowKitProvider theme={rainbowKitTheme} modalSize="compact">
+                <RainbowKitProvider
+                  theme={rainbowKitTheme}
+                  modalSize="compact"
+                  appInfo={{
+                    appName: 'Seekhype EVM',
+                    disclaimer: Disclaimer,
+                  }}
+                >
                   <ToastContextProvider>
                     <FunctionalComponent {...pageProps} />
                   </ToastContextProvider>

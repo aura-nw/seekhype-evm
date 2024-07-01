@@ -9,7 +9,7 @@ import { SWRResponse } from 'swr'
 import {
   EditListingModal,
   EditListingStep,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 
 type Props = {
   listingId?: string

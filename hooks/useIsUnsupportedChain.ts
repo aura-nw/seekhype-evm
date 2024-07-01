@@ -1,4 +1,4 @@
-import { reservoirChains } from '@reservoir0x/reservoir-sdk'
+import { reservoirChains } from '@sh-reservoir0x/reservoir-sdk'
 import { useEffect, useState } from 'react'
 import { useAccount } from 'wagmi'
 
@@ -30,7 +30,6 @@ const MAINNET_CHAINS: Chain[] = [
   reservoirChains.scroll,
   reservoirChains.opBnb,
   reservoirChains.ancient8,
-  reservoirChains.astarZkEVM,
   reservoirChains.blast,
 ]
 
@@ -42,20 +41,20 @@ const MAINNET_DEPLOYMENT_URLS = [
 
 const IS_TESTNET_DEPLOYMENT =
   !MAINNET_DEPLOYMENT_URLS.includes(
-    process.env.NEXT_PUBLIC_HOST_URL as string
+    process.env.NEXT_PUBLIC_HOST_URL as string,
   ) && process.env.NEXT_PUBLIC_HOST_URL == 'https://testnets.reservoir.tools'
 
 export default () => {
   const [unsupportedChain, setUnsupportedChain] = useState<Chain | undefined>(
-    undefined
+    undefined,
   )
   const { chain } = useAccount()
 
   useEffect(() => {
     setUnsupportedChain(
       (IS_TESTNET_DEPLOYMENT ? MAINNET_CHAINS : TESTNET_CHAINS).find(
-        ({ id }) => chain?.id === id
-      )
+        ({ id }) => chain?.id === id,
+      ),
     )
   }, [chain])
   return {

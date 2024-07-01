@@ -6,13 +6,13 @@ import React, {
   useContext,
 } from 'react'
 import { SWRResponse } from 'swr'
-import { BuyModal, BuyStep } from '@reservoir0x/reservoir-kit-ui'
-import { Button } from 'components/primitives'
+import { BuyModal, BuyStep } from '@sh-reservoir0x/reservoir-kit-ui'
+import { Box, Button } from 'components/primitives'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
 import { CSS } from '@stitches/react'
 import { useMarketplaceChain } from 'hooks'
 import { ReferralContext } from '../../context/ReferralContextProvider'
-import { BuyTokenBodyParameters } from '@reservoir0x/reservoir-sdk'
+import { BuyTokenBodyParameters } from '@sh-reservoir0x/reservoir-sdk'
 
 type Props = {
   tokenId?: string
@@ -40,7 +40,6 @@ const BuyNow: FC<Props> = ({
   const { openConnectModal } = useConnectModal()
   const marketplaceChain = useMarketplaceChain()
   const { feesOnTop } = useContext(ReferralContext)
-
   return (
     <BuyModal
       trigger={

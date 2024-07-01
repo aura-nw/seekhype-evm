@@ -1,5 +1,5 @@
 import fetcher from 'utils/fetcher'
-import { paths } from '@reservoir0x/reservoir-sdk'
+import { paths } from '@sh-reservoir0x/reservoir-sdk'
 import supportedChains, { ReservoirChain } from 'utils/chains'
 import { isAddress as isViemAddress } from 'viem'
 
@@ -108,6 +108,7 @@ async function searchSingleChain(chain: ReservoirChain, query: string) {
   } else if (community) {
     queryData.community = community
   }
+  console.log(`${reservoirBaseUrl}/search/collections/v1`);
   const promise = fetcher(
     `${reservoirBaseUrl}/search/collections/v1`,
     queryData,
@@ -116,7 +117,7 @@ async function searchSingleChain(chain: ReservoirChain, query: string) {
   promise.catch((e: any) => console.warn('Failed to search', e))
 
   let isAddress = isViemAddress(query as string)
-  let searchResults = []
+  let searchResults: any[] = []
 
   if (isAddress) {
     const { data } = await fetcher(

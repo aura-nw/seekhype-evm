@@ -21,7 +21,7 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { Currency, Listing, ListModal } from '@reservoir0x/reservoir-kit-ui'
+import { Currency, Listing, ListModal } from '@sh-reservoir0x/reservoir-kit-ui'
 import expirationOptions from 'utils/defaultExpirationOptions'
 import { ExpirationOption } from 'types/ExpirationOption'
 import { UserToken } from 'pages/portfolio/[[...address]]'
@@ -235,15 +235,15 @@ const BatchListings: FC<Props> = ({
       return (
         prevListings?.map((listing) => {
           if (
-            listing.token.token?.collection?.floorAsk?.price?.amount?.decimal &&
-            listing.token.token?.collection?.floorAsk?.price?.currency
+            listing?.token?.token?.collection?.floorAskPrice?.amount?.decimal &&
+            listing?.token?.token?.collection?.floorAskPrice?.currency
           ) {
             return {
               ...listing,
               price:
-                listing.token.token.collection?.floorAsk?.price?.amount.decimal.toString(),
-              currency: listing.token.token?.collection?.floorAsk?.price
-                .currency as Currency,
+                listing.token.token.collection?.floorAskPrice?.amount.decimal.toString(),
+              currency: listing.token.token?.collection?.floorAskPrice
+                ?.currency as Currency,
             }
           }
           return listing
@@ -440,6 +440,7 @@ const BatchListings: FC<Props> = ({
                     amount={totalProfit}
                     address={listings[0].currency.contract}
                     logoHeight={18}
+                    maximumFractionDigits={2}
                     textStyle={'h6'}
                     css={{
                       width: 'max-content',

@@ -5,7 +5,7 @@ import { Button, Flex, Text } from 'components/primitives'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faClose } from '@fortawesome/free-solid-svg-icons'
 import { CollectionOffer } from 'components/buttons'
-import { useCollections } from '@reservoir0x/reservoir-kit-ui'
+import { useCollections } from '@sh-reservoir0x/reservoir-kit-ui'
 
 type Attribute = {
   key: string
@@ -91,7 +91,7 @@ const SelectedAttributes: FC<Props> = ({ collection, mutate }) => {
         </Button>
       )}
 
-      {filters.length === 1 && (
+      {/* {filters.length === 1 && (
         <CollectionOffer
           collection={collection}
           buttonChildren={
@@ -107,7 +107,7 @@ const SelectedAttributes: FC<Props> = ({ collection, mutate }) => {
           buttonCss={{ px: '$4' }}
           mutate={mutate}
         />
-      )}
+      )} */}
     </Flex>
   )
 }

@@ -1,7 +1,7 @@
 import {
   useCollections,
   useTrendingCollections,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import { Text, Button, Box } from '../primitives'
 import {
   DropdownMenuItem,

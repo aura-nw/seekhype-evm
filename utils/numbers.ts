@@ -19,7 +19,7 @@ function formatNumber(
     maximumFractionDigits: maximumFractionDigits,
     notation: compact ? 'compact' : 'standard',
   })
-  if (amount === null || amount === undefined) {
+  if (amount === null || amount === undefined || amount === 0 || amount === '0') {
     return '-'
   }
   if (Number(amount) >= 1000000000) {
@@ -59,7 +59,8 @@ function formatBN(
   maximumFractionDigits: number,
   decimals: number = 18
 ) {
-  if (typeof amount === 'undefined' || amount === null) return '-'
+  if (typeof amount === 'undefined' || amount === null || amount === 0 || amount === '0')
+    return '-'
 
   const amountToFormat =
     typeof amount === 'number'

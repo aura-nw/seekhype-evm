@@ -16,7 +16,7 @@ import {
   useDynamicTokens,
   useTokens,
   useUserTokens,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import { AcceptBid } from 'components/buttons'
 import BuyNow from 'components/buttons/BuyNow'
 import CancelListing from 'components/buttons/CancelListing'
@@ -131,6 +131,10 @@ export default ({
     )
   }, [selectedItems])
 
+  let creatorRoyalties = token?.token?.collection?.royaltiesBps
+    ? token?.token?.collection?.royaltiesBps * 0.01
+    : 0
+
   return (
     <Box
       css={{
@@ -177,7 +181,7 @@ export default ({
           </Text>
         </Flex>
       )}
-      {isOwner && !isSmallDevice ? (
+      {/* {isOwner && !isSmallDevice ? (
         <Button
           css={{
             borderRadius: '99999px',
@@ -212,7 +216,7 @@ export default ({
             height={20}
           />
         </Button>
-      ) : null}
+      ) : null} */}
       <Link
         passHref
         href={`/${routePrefix}/asset/${token?.token?.contract}:${token?.token?.tokenId}`}
@@ -319,27 +323,29 @@ export default ({
                 textOverflow: 'ellipsis',
               }}
             >
-              {token?.ownership?.floorAsk?.price && (
-                <FormatCryptoCurrency
-                  logoHeight={18}
-                  amount={token?.ownership?.floorAsk?.price?.amount?.decimal}
-                  address={
-                    token?.ownership?.floorAsk?.price?.currency?.contract
-                  }
-                  textStyle="h6"
-                  css={{
-                    textOverflow: 'ellipsis',
-                    minWidth: 0,
-                    with: '100%',
-                    overflow: 'hidden',
-                  }}
-                  maximumFractionDigits={4}
-                />
-              )}
+              {token?.ownership?.floorAsk?.price &&
+                (token as any)?.token?.floorAsk?.maker?.toLowerCase() ===
+                  address?.toLowerCase() && (
+                  <FormatCryptoCurrency
+                    logoHeight={18}
+                    amount={token?.ownership?.floorAsk?.price?.amount?.decimal}
+                    address={
+                      token?.ownership?.floorAsk?.price?.currency?.contract
+                    }
+                    textStyle="h6"
+                    css={{
+                      textOverflow: 'ellipsis',
+                      minWidth: 0,
+                      with: '100%',
+                      overflow: 'hidden',
+                    }}
+                    maximumFractionDigits={2}
+                  />
+                )}
             </Box>
 
             <>
-              {token?.ownership?.floorAsk?.source?.name && (
+              {/* {token?.ownership?.floorAsk?.source?.name && (
                 <img
                   style={{
                     width: 20,
@@ -348,7 +354,7 @@ export default ({
                   }}
                   src={`${process.env.NEXT_PUBLIC_PROXY_URL}${proxyApi}/redirect/sources/${token?.ownership?.floorAsk?.source?.domain}/logo/v2`}
                 />
-              )}
+              )} */}
             </>
           </Flex>
           {token?.token?.lastSale?.price?.amount?.decimal ? (
@@ -362,13 +368,16 @@ export default ({
                 address={token.token.lastSale.price.currency?.contract}
                 decimals={token.token.lastSale.price.currency?.decimals}
                 textStyle="subtitle3"
-                maximumFractionDigits={4}
+                maximumFractionDigits={2}
               />
             </Flex>
           ) : null}
         </Flex>
       </Link>
-      {!isOwner && token?.ownership?.floorAsk?.price?.amount ? (
+      {!isOwner &&
+      token?.ownership?.floorAsk?.price?.amount &&
+      (token as any)?.token?.floorAsk?.maker?.toLowerCase() ===
+        address?.toLowerCase() ? (
         <Flex
           className="token-button-container"
           css={{
@@ -467,6 +476,7 @@ export default ({
                     <Text>Accept Best Offer</Text>
                   </>
                 }
+                collectionRoyalty={creatorRoyalties}
               />
             )}
             <DropdownMenuItem
@@ -515,7 +525,7 @@ export default ({
                     })
 
                     setIsRefreshing(false)
-                    throw e
+                    // throw e
                   })
               }}
             >
@@ -573,7 +583,9 @@ export default ({
               />
             ) : null}
 
-            {token?.ownership?.floorAsk?.id ? (
+            {token?.ownership?.floorAsk?.id &&
+            (token as any)?.token?.floorAsk?.maker?.toLowerCase() ===
+              address?.toLowerCase() ? (
               <CancelListing
                 listingId={token.ownership.floorAsk.id as string}
                 mutate={mutate}

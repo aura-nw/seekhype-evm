@@ -33,7 +33,7 @@ import {
   useReservoirClient,
   useTokens,
   useUserTokens,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
   faBolt,
@@ -63,6 +63,8 @@ import { ItemView } from './ViewToggle'
 import PortfolioTokenCard from './PortfolioTokenCard'
 import optimizeImage from 'utils/optimizeImage'
 import { Address } from 'viem'
+import { useAccount } from 'wagmi'
+import { useRouter } from 'next/router'
 
 type Props = {
   address: Address | undefined
@@ -212,6 +214,7 @@ export const TokenTable = forwardRef<TokenTableRef, Props>(
                       onAcceptBidModalOpened={(open) => {
                         setAcceptBidModalOpen(open)
                       }}
+                      royalty={token?.token?.collection?.royaltiesBps || 0}
                     />
                   )
                 })}
@@ -282,6 +285,7 @@ type TokenTableRowProps = {
   setSelectedItems: Dispatch<SetStateAction<UserToken[]>>
   onAcceptBidModalOpened: (open: boolean) => void
   isOwner: boolean
+  royalty?: number
 }
 
 const TokenTableRow: FC<TokenTableRowProps> = ({
@@ -291,6 +295,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
   onAcceptBidModalOpened,
   mutate,
   setSelectedItems,
+  royalty,
 }) => {
   const { routePrefix, proxyApi } = useMarketplaceChain()
   const { addToast } = useContext(ToastContext)
@@ -338,6 +343,14 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
   const contract = token.token?.collection?.id
     ? token.token?.collection.id?.split(':')[0]
     : undefined
+
+  const router = useRouter()
+  const { address: accountAddress, isConnected } = useAccount()
+  const address = router.query.address
+    ? (router.query.address[0] as `0x${string}`)
+    : accountAddress
+
+  let creatorRoyalties = royalty ? royalty * 0.01 : 0
 
   if (isSmallDevice) {
     return (
@@ -395,20 +408,19 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
               Floor
             </Text>
             <FormatCryptoCurrency
-              amount={
-                token?.token?.collection?.floorAsk?.price?.amount?.decimal
-              }
+              amount={token?.token?.collection?.floorAskPrice?.amount?.decimal}
               address={
-                token?.token?.collection?.floorAsk?.price?.currency?.contract
+                token?.token?.collection?.floorAskPrice?.currency?.contract
               }
               decimals={
-                token?.token?.collection?.floorAsk?.price?.currency?.decimals
+                token?.token?.collection?.floorAskPrice?.currency?.decimals
               }
               textStyle="subtitle2"
               logoHeight={14}
+              maximumFractionDigits={2}
             />
           </Flex>
-          <Flex direction="column" align="start" css={{ width: '100%' }}>
+          {/* <Flex direction="column" align="start" css={{ width: '100%' }}>
             <Text style="subtitle3" color="subtle">
               Top Offer
             </Text>
@@ -418,8 +430,9 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
               decimals={token?.token?.topBid?.price?.currency?.decimals}
               textStyle="subtitle2"
               logoHeight={14}
+              maximumFractionDigits={2}
             />
-          </Flex>
+          </Flex> */}
         </Flex>
         <Flex css={{ gap: '$2', width: '100%' }}>
           {token?.token?.topBid?.price?.amount?.decimal && isOwner ? (
@@ -453,6 +466,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                   Sell
                 </Flex>
               }
+              collectionRoyalty={creatorRoyalties}
             />
           ) : null}
           {isOwner ? (
@@ -537,7 +551,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                     })
 
                     setIsRefreshing(false)
-                    throw e
+                    // throw e
                   })
               }}
             >
@@ -654,7 +668,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
     >
       <TableCell css={{ minWidth: 0, overflow: 'hidden' }}>
         <Flex align="center" css={{ gap: '$3' }}>
-          {isOwner ? (
+          {/* {isOwner ? (
             <Checkbox
               checked={isSelectedItem(token)}
               onCheckedChange={(checked) => {
@@ -665,7 +679,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                 }
               }}
             />
-          ) : null}
+          ) : null} */}
           <Link
             href={`/${routePrefix}/asset/${token?.token?.contract}:${token?.token?.tokenId}`}
           >
@@ -738,68 +752,81 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
               ? undefined
               : false
           }
-          content={
-            <Flex direction="column" css={{ gap: '$2' }}>
-              <Flex justify="between" css={{ gap: '$3' }}>
-                <Text style="body3">Total Listed Price</Text>
-                <FormatCryptoCurrency
-                  amount={token?.ownership?.floorAsk?.price?.amount?.decimal}
-                  address={
-                    token?.ownership?.floorAsk?.price?.currency?.contract
-                  }
-                  decimals={
-                    token?.ownership?.floorAsk?.price?.currency?.decimals
-                  }
-                  textStyle="subtitle3"
-                  logoHeight={14}
-                />
-              </Flex>
-              <Flex justify="between" css={{ gap: '$2' }}>
-                <Text style="body3">You Get</Text>
-                <FormatCryptoCurrency
-                  amount={token?.ownership?.floorAsk?.price?.netAmount?.decimal}
-                  address={
-                    token?.ownership?.floorAsk?.price?.currency?.contract
-                  }
-                  decimals={
-                    token?.ownership?.floorAsk?.price?.currency?.decimals
-                  }
-                  textStyle="subtitle3"
-                  logoHeight={14}
-                />
-              </Flex>
-            </Flex>
-          }
+          // content={
+          //   <Flex direction="column" css={{ gap: '$2' }}>
+          //     <Flex justify="between" css={{ gap: '$3' }}>
+          //       <Text style="body3">Total Listed Price</Text>
+          //       <FormatCryptoCurrency
+          //         amount={token?.ownership?.floorAsk?.price?.amount?.decimal}
+          //         address={
+          //           token?.ownership?.floorAsk?.price?.currency?.contract
+          //         }
+          //         decimals={
+          //           token?.ownership?.floorAsk?.price?.currency?.decimals
+          //         }
+          //         textStyle="subtitle3"
+          //         logoHeight={14}
+          //         maximumFractionDigits={2}
+          //       />
+          //     </Flex>
+          //     <Flex justify="between" css={{ gap: '$2' }}>
+          //       <Text style="body3">You Get</Text>
+          //       <FormatCryptoCurrency
+          //         amount={token?.ownership?.floorAsk?.price?.netAmount?.decimal}
+          //         address={
+          //           token?.ownership?.floorAsk?.price?.currency?.contract
+          //         }
+          //         decimals={
+          //           token?.ownership?.floorAsk?.price?.currency?.decimals
+          //         }
+          //         textStyle="subtitle3"
+          //         logoHeight={14}
+          //         maximumFractionDigits={2}
+          //       />
+          //     </Flex>
+          //   </Flex>
+          // }
         >
           <Flex align="center" css={{ gap: '$2' }}>
-            {token.ownership?.floorAsk?.source?.icon ? (
+            {/* {token.ownership?.floorAsk?.source?.icon ? (
               <img
                 src={token.ownership.floorAsk.source.icon as string}
                 alt="Listing Source Icon"
                 style={{ height: 16, width: 16 }}
               />
-            ) : null}
+            ) : null} */}
             <FormatCryptoCurrency
-              amount={token?.ownership?.floorAsk?.price?.amount?.decimal}
+              amount={
+                (token as any)?.token?.floorAsk?.maker?.toLowerCase() !==
+                address?.toLowerCase()
+                  ? undefined
+                  : (token as any)?.token?.floorAsk?.price?.amount?.decimal
+              }
               address={token?.ownership?.floorAsk?.price?.currency?.contract}
               decimals={token?.ownership?.floorAsk?.price?.currency?.decimals}
               textStyle="subtitle1"
               logoHeight={14}
+              maximumFractionDigits={2}
             />
           </Flex>
         </Tooltip>
       </TableCell>
       <TableCell>
         <FormatCryptoCurrency
-          amount={token?.token?.collection?.floorAsk?.price?.amount?.decimal}
+          amount={
+            (token as any)?.token?.collection?.floorAsk?.price?.amount?.decimal
+          }
           address={
-            token?.token?.collection?.floorAsk?.price?.currency?.contract
+            (token as any)?.token?.collection?.floorAsk?.price?.currency
+              ?.contract
           }
           decimals={
-            token?.token?.collection?.floorAsk?.price?.currency?.decimals
+            (token as any)?.token?.collection?.floorAsk?.price?.currency
+              ?.decimals
           }
           textStyle="subtitle1"
           logoHeight={14}
+          maximumFractionDigits={2}
         />
       </TableCell>
       <TableCell>
@@ -809,34 +836,35 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
           open={
             token?.token?.topBid?.price?.amount?.decimal ? undefined : false
           }
-          content={
-            <Flex direction="column" css={{ gap: '$2' }}>
-              <Flex justify="between" css={{ gap: '$3' }}>
-                <Text style="body3">Total Offer</Text>
-                <FormatCryptoCurrency
-                  amount={token?.token?.topBid?.price?.amount?.decimal}
-                  address={token?.token?.topBid?.price?.currency?.contract}
-                  decimals={token?.token?.topBid?.price?.currency?.decimals}
-                  textStyle="subtitle3"
-                  logoHeight={14}
-                />
-              </Flex>
-              <Flex justify="between" css={{ gap: '$2' }}>
-                <Text style="body3">You Get</Text>
-                <FormatCryptoCurrency
-                  amount={token?.token?.topBid?.price?.netAmount?.decimal}
-                  address={token?.token?.topBid?.price?.currency?.contract}
-                  decimals={token?.token?.topBid?.price?.currency?.decimals}
-                  textStyle="subtitle3"
-                  logoHeight={14}
-                />
-              </Flex>
-            </Flex>
-          }
+          // content={
+          //   <Flex direction="column" css={{ gap: '$2' }}>
+          //     <Flex justify="between" css={{ gap: '$3' }}>
+          //       <Text style="body3">Total Offer</Text>
+          //       <FormatCryptoCurrency
+          //         amount={token?.token?.topBid?.price?.amount?.decimal}
+          //         address={token?.token?.topBid?.price?.currency?.contract}
+          //         decimals={token?.token?.topBid?.price?.currency?.decimals}
+          //         textStyle="subtitle3"
+          //         logoHeight={14}
+          //         maximumFractionDigits={2}
+          //       />
+          //     </Flex>
+          //     <Flex justify="between" css={{ gap: '$2' }}>
+          //       <Text style="body3">You Get</Text>
+          //       <FormatCryptoCurrency
+          //         amount={token?.token?.topBid?.price?.netAmount?.decimal}
+          //         address={token?.token?.topBid?.price?.currency?.contract}
+          //         decimals={token?.token?.topBid?.price?.currency?.decimals}
+          //         textStyle="subtitle3"
+          //         logoHeight={14}
+          //         maximumFractionDigits={2}
+          //       />
+          //     </Flex>
+          //   </Flex>
+          // }
         >
-          <Flex direction="column" align="start">
+          {/* <Flex direction="column" align="start">
             <Flex css={{ gap: '$2' }} align="center">
-              {/* TODO: Replace this when the api is patched */}
               {(token.token?.topBid as any)?.source?.icon ? (
                 <img
                   src={(token?.token?.topBid as any).source.icon as string}
@@ -850,6 +878,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                 decimals={token?.token?.topBid?.price?.currency?.decimals}
                 textStyle="subtitle2"
                 logoHeight={14}
+                maximumFractionDigits={2}
               />
             </Flex>
             {token?.token?.topBid?.price?.amount?.usd ? (
@@ -859,7 +888,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                 )}
               </Text>
             ) : null}
-          </Flex>
+          </Flex> */}
         </Tooltip>
       </TableCell>
       {isOwner && (
@@ -893,6 +922,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                   </Flex>
                 }
                 mutate={mutate}
+                collectionRoyalty={creatorRoyalties}
               />
             ) : null}
 
@@ -968,7 +998,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                       })
 
                       setIsRefreshing(false)
-                      throw e
+                      // throw e
                     })
                 }}
               >
@@ -1026,7 +1056,9 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                 />
               ) : null}
 
-              {token?.ownership?.floorAsk?.id ? (
+              {token?.ownership?.floorAsk?.id &&
+              (token as any)?.token?.floorAsk?.maker?.toLowerCase() ===
+                address?.toLowerCase() ? (
                 <CancelListing
                   listingId={token.ownership.floorAsk.id as string}
                   mutate={mutate}
@@ -1103,11 +1135,11 @@ const TableHeading: FC<{ isOwner: boolean }> = ({ isOwner }) => (
         Floor
       </Text>
     </TableCell>
-    <TableCell>
+    {/* <TableCell>
       <Text style="subtitle3" color="subtle">
         Top Offer
       </Text>
-    </TableCell>
+    </TableCell> */}
     {isOwner ? <TableCell></TableCell> : null}
   </HeaderRow>
 )

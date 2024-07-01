@@ -1,4 +1,4 @@
-import { ListModal, ListStep, useTokens } from '@reservoir0x/reservoir-kit-ui'
+import { ListModal, ListStep, useTokens } from '@sh-reservoir0x/reservoir-kit-ui'
 import { Button } from 'components/primitives'
 import {
   cloneElement,
@@ -90,7 +90,6 @@ const List: FC<Props> = ({
             description: 'The transaction was not completed.',
           })
         }}
-        oracleEnabled={marketplaceChain.oracleBidsEnabled}
         onPointerDownOutside={(e) => {
           const privyLayer = document.getElementById('privy-dialog')
 

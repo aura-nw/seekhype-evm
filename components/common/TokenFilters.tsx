@@ -10,7 +10,7 @@ import * as Collapsible from '@radix-ui/react-collapsible'
 import { CollapsibleContent } from 'components/primitives/Collapsible'
 import Image from 'next/image'
 import { NAVBAR_HEIGHT } from 'components/navbar'
-import { useUserCollections } from '@reservoir0x/reservoir-kit-ui'
+import { useUserCollections } from '@sh-reservoir0x/reservoir-kit-ui'
 import { OpenSeaVerified } from './OpenSeaVerified'
 import { PercentChange } from 'components/primitives/PercentChange'
 import LoadMoreCollections from 'components/common/LoadMoreCollections'
@@ -154,6 +154,7 @@ export const TokenFilters: FC<Props> = ({
                         collection.collection?.floorAskPrice?.currency?.contract
                       }
                       textStyle="h6"
+                      maximumFractionDigits={2}
                     />
                   </Flex>
                 </Flex>

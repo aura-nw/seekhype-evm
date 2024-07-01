@@ -18,7 +18,7 @@ const UnsupportedChainBanner = (): JSX.Element => {
             background: theme === 'dark' ? '$violet6' : '$violet9',
           }}
         >
-          <Text
+          {/* <Text
             style="body2"
             css={{
               color: 'White',
@@ -49,7 +49,7 @@ const UnsupportedChainBanner = (): JSX.Element => {
                 </Text>
               </Link>
             </>
-          </Text>
+          </Text> */}
         </Flex>
       )}
     </>

@@ -1,7 +1,7 @@
-import { paths } from '@reservoir0x/reservoir-sdk'
+import { paths } from '@sh-reservoir0x/reservoir-sdk'
 import { useMemo } from 'react'
 import useSWR from 'swr/immutable'
-import { setParams } from '@reservoir0x/reservoir-sdk'
+import { setParams } from '@sh-reservoir0x/reservoir-sdk'
 import useMarketplaceChain from './useMarketplaceChain'
 
 type MarketplaceConfigurationsResponse =

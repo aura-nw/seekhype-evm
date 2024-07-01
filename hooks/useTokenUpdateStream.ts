@@ -1,4 +1,4 @@
-import { useReservoirClient } from '@reservoir0x/reservoir-kit-ui'
+import { useReservoirClient } from '@sh-reservoir0x/reservoir-kit-ui'
 import { WebsocketContext } from 'context/WebsocketContextProvider'
 import useChainWebsocket from 'hooks/useChainWebsocket'
 import { useContext, useEffect } from 'react'

@@ -6,7 +6,7 @@ import React, {
   useContext,
 } from 'react'
 import { useConnectModal } from '@rainbow-me/rainbowkit'
-import { SweepModal, SweepStep } from '@reservoir0x/reservoir-kit-ui'
+import { SweepModal, SweepStep } from '@sh-reservoir0x/reservoir-kit-ui'
 import { useMarketplaceChain } from 'hooks'
 import { CSS } from '@stitches/react'
 import { Button } from 'components/primitives'

@@ -1,6 +1,6 @@
 import { faGasPump, faHand } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useBids } from '@reservoir0x/reservoir-kit-ui'
+import { useBids } from '@sh-reservoir0x/reservoir-kit-ui'
 import { AcceptBid } from 'components/buttons'
 import CancelBid from 'components/buttons/CancelBid'
 import EditBid from 'components/buttons/EditBid'
@@ -28,10 +28,11 @@ type Props = {
   address?: string
   token: Parameters<typeof useBids>['0']['token']
   is1155: boolean
-  isOwner: boolean
+  isOwner: boolean,
+  royalty?: number
 }
 
-export const OffersTable: FC<Props> = ({ token, address, is1155, isOwner }) => {
+export const OffersTable: FC<Props> = ({ token, address, is1155, isOwner, royalty }) => {
   const loadMoreRef = useRef<HTMLDivElement>(null)
   const loadMoreObserver = useIntersectionObserver(loadMoreRef, {})
   const [userOnly, setUserOnly] = useState(false)
@@ -111,6 +112,7 @@ export const OffersTable: FC<Props> = ({ token, address, is1155, isOwner }) => {
                   is1155={is1155}
                   isOwner={isOwner}
                   mutate={mutate}
+                  royalty={royalty}
                 />
               )
             })}
@@ -134,6 +136,7 @@ type OfferTableRowProps = {
   is1155: boolean
   isOwner: boolean
   address?: string
+  royalty?: number
   mutate?: MutatorCallback
 }
 
@@ -143,6 +146,7 @@ const OfferTableRow: FC<OfferTableRowProps> = ({
   is1155,
   isOwner,
   address,
+  royalty,
   mutate,
 }) => {
   const { displayName: fromDisplayName } = useENSResolver(offer.maker)
@@ -161,6 +165,10 @@ const OfferTableRow: FC<OfferTableRowProps> = ({
   const offerSourceLogo = `${
     process.env.NEXT_PUBLIC_PROXY_URL
   }${proxyApi}/redirect/sources/${offerSourceDomain || offerSourceName}/logo/v2`
+
+  let creatorRoyalties = royalty
+    ? royalty * 0.01
+    : 0
 
   return (
     <TableRow
@@ -190,6 +198,7 @@ const OfferTableRow: FC<OfferTableRowProps> = ({
                   decimals={offer?.price?.currency?.decimals}
                   textStyle="subtitle3"
                   logoHeight={14}
+                  maximumFractionDigits={2}
                 />
               </Flex>
             }
@@ -201,6 +210,7 @@ const OfferTableRow: FC<OfferTableRowProps> = ({
                 decimals={offer?.price?.currency?.decimals}
                 textStyle="h6"
                 logoHeight={16}
+                maximumFractionDigits={2}
               />
             </Flex>
           </Tooltip>
@@ -235,7 +245,7 @@ const OfferTableRow: FC<OfferTableRowProps> = ({
             <span>-</span>
           )}
 
-          <img width={16} height={16} src={offerSourceLogo} />
+          {/* <img width={16} height={16} src={offerSourceLogo} /> */}
         </Flex>
       </Flex>
       <Flex direction="column" align="end" css={{ gap: '$2' }}>
@@ -253,6 +263,7 @@ const OfferTableRow: FC<OfferTableRowProps> = ({
               }
               buttonProps={{ color: 'primary' }}
               buttonCss={{ fontSize: 14, px: '$4', py: '$2', minHeight: 36 }}
+              collectionRoyalty={creatorRoyalties}
             />
           ) : null}
           {/* Not Owner and is user offer, owner of erc 1155 and is your offer */}

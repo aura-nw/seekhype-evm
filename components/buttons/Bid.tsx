@@ -1,4 +1,4 @@
-import { BidModal, BidStep } from '@reservoir0x/reservoir-kit-ui'
+import { BidModal, BidStep } from '@sh-reservoir0x/reservoir-kit-ui'
 import { Button } from 'components/primitives'
 import {
   cloneElement,
@@ -95,8 +95,8 @@ const Bid: FC<Props> = ({
         onBidError={(error) => {
           if (error) {
             if (
-              (error as any).cause.code &&
-              (error as any).cause.code === 4001
+              (error as any).cause?.code &&
+              (error as any).cause?.code === 4001
             ) {
               addToast?.({
                 title: 'User canceled transaction',

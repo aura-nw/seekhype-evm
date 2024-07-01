@@ -4,7 +4,7 @@ import {
   extractMediaType,
   TokenMedia,
   useDynamicTokens,
-} from '@reservoir0x/reservoir-kit-ui'
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import AddToCart from 'components/buttons/AddToCart'
 import BuyNow from 'components/buttons/BuyNow'
 import { Box, Flex, FormatCryptoCurrency, Text } from 'components/primitives'
@@ -51,7 +51,7 @@ export default ({
     mediaType === 'mov'
   const { routePrefix, proxyApi } = useMarketplaceChain()
   const tokenIsInCart = token && token?.isInCart
-  const isOwner = token?.token?.owner?.toLowerCase() !== address?.toLowerCase()
+  const isOwner = token?.token?.owner?.toLowerCase() === address?.toLowerCase()
 
   const is1155 = token?.token?.kind === 'erc1155'
 
@@ -252,28 +252,29 @@ export default ({
                     textOverflow: 'ellipsis',
                   }}
                 >
-                  {token?.market?.floorAsk?.price && (
-                    <FormatCryptoCurrency
-                      logoHeight={18}
-                      amount={token?.market?.floorAsk?.price?.amount?.raw}
-                      address={
-                        token?.market?.floorAsk?.price?.currency?.contract
-                      }
-                      decimals={
-                        token?.market?.floorAsk?.price?.currency?.decimals
-                      }
-                      borderRadius="100%"
-                      textStyle="h6"
-                      css={{
-                        textOverflow: 'ellipsis',
-                        minWidth: 0,
-                        with: '100%',
-                        overflow: 'hidden',
-                        fontSize: 18,
-                      }}
-                      maximumFractionDigits={4}
-                    />
-                  )}
+                  {token?.market?.floorAsk?.price &&
+                    token?.market?.floorAsk?.maker === token?.token?.owner && (
+                      <FormatCryptoCurrency
+                        logoHeight={18}
+                        amount={token?.market?.floorAsk?.price?.amount?.raw}
+                        address={
+                          token?.market?.floorAsk?.price?.currency?.contract
+                        }
+                        decimals={
+                          token?.market?.floorAsk?.price?.currency?.decimals
+                        }
+                        borderRadius="100%"
+                        textStyle="h6"
+                        css={{
+                          textOverflow: 'ellipsis',
+                          minWidth: 0,
+                          with: '100%',
+                          overflow: 'hidden',
+                          fontSize: 18,
+                        }}
+                        maximumFractionDigits={2}
+                      />
+                    )}
                 </Box>
 
                 {is1155 && token?.market?.floorAsk?.quantityRemaining ? (
@@ -317,13 +318,16 @@ export default ({
                 address={token.token.lastSale.price.currency?.contract}
                 decimals={token.token.lastSale.price.currency?.decimals}
                 textStyle="subtitle3"
-                maximumFractionDigits={4}
+                maximumFractionDigits={2}
               />
             </Flex>
           ) : null}
         </Flex>
       </Link>
-      {showAsk && isOwner && token?.market?.floorAsk?.price?.amount ? (
+      {showAsk &&
+      !isOwner &&
+      token?.market?.floorAsk?.price?.amount &&
+      token?.market?.floorAsk?.maker === token?.token?.owner ? (
         <Flex
           className="token-button-container"
           css={{

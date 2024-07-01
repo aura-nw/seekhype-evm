@@ -5,7 +5,6 @@ import {
   ComponentProps,
   ElementRef,
   forwardRef,
-  ReactElement,
 } from 'react'
 
 type AvatarRootProps = ComponentProps<typeof AvatarRoot>
@@ -73,7 +72,7 @@ const AvatarFallback = styled(AvatarPrimitive.Fallback, {
 export const Avatar = forwardRef<
   ElementRef<typeof AvatarImage>,
   ComponentPropsWithoutRef<typeof AvatarImage> & {
-    fallback?: ReactElement
+    fallback?: string
     size?: AvatarRootProps['size']
     corners?: AvatarRootProps['corners']
   }

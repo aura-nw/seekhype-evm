@@ -12,7 +12,7 @@ import {
   IconDefinition,
 } from '@fortawesome/free-solid-svg-icons'
 import { FullscreenModal } from 'components/common/FullscreenModal'
-import { useCollectionActivity } from '@reservoir0x/reservoir-kit-ui'
+import { useCollectionActivity } from '@sh-reservoir0x/reservoir-kit-ui'
 
 type ActivityTypes = Exclude<
   NonNullable<

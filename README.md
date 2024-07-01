@@ -1,4 +1,4 @@
-<h3 align="center">Reservoir Market v2</h3>
+<h3 align="center">Seekhype Market v2</h3>
   <p align="center">
 An open source NFT marketplace built on Reservoir.
 
@@ -93,7 +93,7 @@ This is a Next.js app that can be easily deployed using [Vercel](https://vercel.
 
 ## Contact
 
-Twitter: [@reservoir0x](https://twitter.com/reservoir0x)
-Project Link: [Reservoir](https://reservoirprotocol.github.io/)
+Twitter: [@AuraNetworkHQ](https://x.com/AuraNetworkHQ)
+Project Link: [Aura Network](https://github.com/aura-nw)
 
 <p align="right">(<a href="#top">back to top</a>)</p>

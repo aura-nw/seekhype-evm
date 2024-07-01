@@ -9,12 +9,12 @@ import {
 } from 'react'
 import { Provider as ToastProvider } from '@radix-ui/react-toast'
 import Toast, { ToastViewport } from 'components/primitives/Toast'
-import { useReservoirClient } from '@reservoir0x/reservoir-kit-ui'
+import { useReservoirClient } from '@sh-reservoir0x/reservoir-kit-ui'
 import { Anchor, Flex } from 'components/primitives'
 import { v4 as uuidv4 } from 'uuid'
-import { Execute } from '@reservoir0x/reservoir-sdk'
+import { Execute } from '@sh-reservoir0x/reservoir-sdk'
 import * as allChains from 'wagmi/chains'
-import { customChains } from '@reservoir0x/reservoir-sdk'
+import { customChains } from '@sh-reservoir0x/reservoir-sdk'
 
 type ToastType = {
   id?: string

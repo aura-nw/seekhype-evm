@@ -1,6 +1,6 @@
 import { FC, useContext, useEffect } from 'react'
 import { ActivityTable } from 'components/common/ActivityTable'
-import { useUsersActivity } from '@reservoir0x/reservoir-kit-ui'
+import { useUsersActivity } from '@sh-reservoir0x/reservoir-kit-ui'
 import { ChainContext } from 'context/ChainContextProvider'
 
 type ActivityQuery = NonNullable<

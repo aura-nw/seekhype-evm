@@ -3,13 +3,14 @@ import { withSentryConfig } from '@sentry/nextjs'
 
 const sentryWebpackPluginOptions = {
   org: process.env.SENTRY_ORG,
-  project: 'explorer',
+  project: process.env.SENTRY_PROJECT,
   silent: true,
 }
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
+  output: 'standalone',
   images: {
     unoptimized: true,
   },

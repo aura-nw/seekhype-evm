@@ -1,7 +1,7 @@
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { useTrendingMints } from '@reservoir0x/reservoir-kit-ui'
+import { useTrendingMints } from '@sh-reservoir0x/reservoir-kit-ui'
 import {
   DropdownMenuContent,
   DropdownMenuItem,
@@ -14,6 +14,7 @@ export type MintsSortingOption = NonNullable<
 >
 
 const sortingOptions: MintsSortingOption[] = [
+  '30d',
   '24h',
   '6h',
   '1h',

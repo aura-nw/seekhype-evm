@@ -1,4 +1,4 @@
-import { useAttributes } from '@reservoir0x/reservoir-kit-ui'
+import { useAttributes } from '@sh-reservoir0x/reservoir-kit-ui'
 import { Box, Flex } from 'components/primitives'
 import { FC } from 'react'
 import { AttributeSelector } from './AttributeSelector'

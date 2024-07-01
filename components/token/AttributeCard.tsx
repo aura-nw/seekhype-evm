@@ -1,5 +1,5 @@
 import { Flex, FormatCryptoCurrency, Text } from 'components/primitives'
-import { useTokens } from '@reservoir0x/reservoir-kit-ui'
+import { useTokens } from '@sh-reservoir0x/reservoir-kit-ui'
 import { formatNumber } from 'utils/numbers'
 import Link from 'next/link'
 import { useMarketplaceChain } from '../../hooks'
@@ -48,8 +48,8 @@ export default ({ attribute, collectionTokenCount, collectionId }: Props) => {
           <FormatCryptoCurrency
             amount={attribute.floorAskPrice?.amount?.decimal}
             logoHeight={14}
-            textStyle="subtitle1"
             maximumFractionDigits={2}
+            textStyle="subtitle1"
           />
         </Flex>
         <Flex justify="between">
