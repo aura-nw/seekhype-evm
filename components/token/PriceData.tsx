@@ -1,4 +1,4 @@
-import { useTokens } from '@sh-reservoir0x/reservoir-kit-ui'
+import { useCoinConversion, useTokens } from '@sh-reservoir0x/reservoir-kit-ui'
 import {
   Flex,
   FormatCryptoCurrency,
@@ -8,6 +8,7 @@ import {
 import { useMarketplaceChain } from 'hooks'
 import { FC } from 'react'
 import { formatDollar } from 'utils/numbers'
+import { formatUnits, parseUnits } from 'viem'
 import { useAccount } from 'wagmi'
 
 type Props = {
@@ -56,6 +57,10 @@ export const PriceData: FC<Props> = ({ token, usdPrice }) => {
 
   const isValidListing = token?.market?.floorAsk?.maker === token?.token?.owner
 
+  const coinConversion = useCoinConversion('USD')
+  const offerUsdPrice = coinConversion.length > 0 ? coinConversion[0].price : 0
+  const usdPriceRaw = parseUnits(offerUsdPrice.toString(), 6)
+
   return (
     <Flex css={{ gap: '$6', pt: '$4', pb: '$5' }}>
       <Flex direction="column" align="start" css={{ gap: '$1' }}>
@@ -64,7 +69,7 @@ export const PriceData: FC<Props> = ({ token, usdPrice }) => {
           align="center"
           css={{
             flexDirection: 'column',
-            '@bp400': { flexDirection: 'row', gap: '$2' },
+            '@bp400': { flexDirection: 'column', gap: '$2' },
           }}
         >
           <FormatCryptoCurrency
@@ -111,13 +116,13 @@ export const PriceData: FC<Props> = ({ token, usdPrice }) => {
           </a>
         )} */}
       </Flex>
-      {/* <Flex direction="column" align="start" css={{ gap: '$1' }}>
+      <Flex direction="column" align="start" css={{ gap: '$1' }}>
         <Text style="subtitle2">Top Offer</Text>
         <Flex
           align="center"
           css={{
             flexDirection: 'column',
-            '@bp400': { flexDirection: 'row', gap: '$2' },
+            '@bp400': { flexDirection: 'column', gap: '$2' },
           }}
         >
           <Tooltip
@@ -153,13 +158,21 @@ export const PriceData: FC<Props> = ({ token, usdPrice }) => {
             </Flex>
           </Tooltip>
 
-          {token?.market?.topBid?.price?.amount?.usd ? (
+          {token?.market?.topBid?.price?.amount?.raw ? (
             <Text style="body3" css={{ color: '$gray11' }} ellipsify>
-              {formatDollar(token?.market?.topBid?.price?.amount?.usd)}
+              {formatDollar(
+                Number(
+                  formatUnits(
+                    BigInt(token?.market?.topBid?.price?.amount?.raw || 0) *
+                      usdPriceRaw,
+                    24
+                  )
+                )
+              )}
             </Text>
           ) : null}
         </Flex>
-        {offerSourceName && (
+        {/* {offerSourceName && (
           <a
             href={offerSourceRedirect}
             target="_blank"
@@ -179,8 +192,8 @@ export const PriceData: FC<Props> = ({ token, usdPrice }) => {
               </Text>
             </Flex>
           </a>
-        )}
-      </Flex> */}
+        )} */}
+      </Flex>
     </Flex>
   )
 }

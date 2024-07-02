@@ -463,7 +463,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
               buttonChildren={
                 <Flex align="center" css={{ gap: '$2' }}>
                   <FontAwesomeIcon icon={faBolt} />
-                  Sell
+                  Accept
                 </Flex>
               }
               collectionRoyalty={creatorRoyalties}
