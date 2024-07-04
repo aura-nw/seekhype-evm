@@ -668,7 +668,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
     >
       <TableCell css={{ minWidth: 0, overflow: 'hidden' }}>
         <Flex align="center" css={{ gap: '$3' }}>
-          {/* {isOwner ? (
+          {isOwner ? (
             <Checkbox
               checked={isSelectedItem(token)}
               onCheckedChange={(checked) => {
@@ -679,7 +679,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                 }
               }}
             />
-          ) : null} */}
+          ) : null}
           <Link
             href={`/${routePrefix}/asset/${token?.token?.contract}:${token?.token?.tokenId}`}
           >
