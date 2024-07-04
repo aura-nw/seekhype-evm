@@ -279,6 +279,7 @@ const OfferTableRow: FC<OfferTableRowProps> = ({
               buttonProps={{ color: 'primary' }}
               buttonCss={{ fontSize: 14, px: '$4', py: '$2', minHeight: 36 }}
               collectionRoyalty={creatorRoyalties}
+              mutate={mutate}
             />
           ) : null}
           {/* Not Owner and is user offer, owner of erc 1155 and is your offer */}
