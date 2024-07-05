@@ -103,7 +103,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
             name: 'isModuleApproved',
             outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
             stateMutability: 'view',
-          type: 'function',
+            type: 'function',
           },
         ],
         address: ContractConfig[aura?.id ? aura?.id : 1235]
@@ -127,49 +127,205 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
       })
   }
 
-  // const checkIsApproveNft = () => {
-  //   publicClient
-  //     ?.readContract({
-  //       abi: [
-  //         {
-  //           constant: true,
-  //           inputs: [
-  //             { internalType: 'address', name: 'owner', type: 'address' },
-  //             { internalType: 'address', name: 'operator', type: 'address' },
-  //           ],
-  //           name: 'isApprovedForAll',
-  //           outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-  //           payable: false,
-  //           stateMutability: 'view',
-  //           type: 'function',
-  //         },
-  //       ],
-  //       address: contract as `0x${string}`,
-  //       functionName: 'isApprovedForAll',
-  //       args: [
-  //         account?.address as `0x${string}`,
-  //         ContractConfig[chainId ? chainId : 1235]
-  //           ?.ERC721TRANSFERHELPER as `0x${string}`,
-  //       ],
-  //     })
-  //     .then((res) => {
-  //       if (res) {
-  //         setIsApproveNft(true)
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       setIsApproveNft(false)
-  //       console.log(err)
-  //       console.log('message: ' + err?.message)
-  //     })
-  // }
+  const checkIsApproveNft = (contract: `0x${string}`) => {
+    publicClient
+      ?.readContract({
+        abi: [
+          {
+            constant: true,
+            inputs: [
+              { internalType: 'address', name: 'owner', type: 'address' },
+              { internalType: 'address', name: 'operator', type: 'address' },
+            ],
+            name: 'isApprovedForAll',
+            outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+            payable: false,
+            stateMutability: 'view',
+            type: 'function',
+          },
+        ],
+        address: contract as `0x${string}`,
+        functionName: 'isApprovedForAll',
+        args: [
+          address as `0x${string}`,
+          ContractConfig[aura?.id ? aura?.id : 1235]
+            ?.ERC721TRANSFERHELPER as `0x${string}`,
+        ],
+      })
+      .then((res) => {
+        if (res) {
+          setIsApproveNft(true)
+        }
+      })
+      .catch((err) => {
+        setIsApproveNft(false)
+        console.log(err)
+        console.log('message: ' + err?.message)
+      })
+  }
 
   useEffect(() => {
     if (publicClient) {
       checkIsApproveModuleAsk()
-      checkIsApproveNft()
+      // checkIsApproveNft()
     }
   }, [publicClient])
+
+  const triggerListTokenContract = (
+    contract: `0x${string}`,
+    tokenId: string,
+    price: string
+  ) => {
+    setBatchListStep(BatchListStep.Approving)
+    setStepData({
+      totalSteps: 1,
+      stepProgress: 1,
+      currentStep: {
+        kind: 'signature',
+        action: '',
+        description:
+          'Please review and confirm to create the listing from your wallet.',
+        id: '1',
+      },
+      listings: [],
+    })
+    // list token
+    wallet
+      ?.writeContract({
+        abi: [
+          {
+            inputs: [
+              {
+                internalType: 'address',
+                name: '_tokenContract',
+                type: 'address',
+              },
+              {
+                internalType: 'uint256',
+                name: '_tokenId',
+                type: 'uint256',
+              },
+              {
+                internalType: 'uint256',
+                name: '_askPrice',
+                type: 'uint256',
+              },
+              {
+                internalType: 'address',
+                name: '_askCurrency',
+                type: 'address',
+              },
+              {
+                internalType: 'address',
+                name: '_sellerFundsRecipient',
+                type: 'address',
+              },
+              {
+                internalType: 'uint16',
+                name: '_findersFeeBps',
+                type: 'uint16',
+              },
+            ],
+            name: 'createAsk',
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+        ],
+        address: ContractConfig[aura?.id ? aura?.id : 1235]
+          ?.ASK1_1_MODULE_ADDRESS as `0x${string}`,
+        functionName: 'createAsk',
+        args: [
+          contract as `0x${string}`,
+          BigInt(Number(tokenId)),
+          parseUnits(price, 18),
+          zeroAddress,
+          address as `0x${string}`,
+          0,
+        ],
+        gas: 500000n,
+      })
+      .then((hash) => {
+        publicClient
+          .waitForTransactionReceipt({ hash })
+          .then((res) => {
+            if (res?.status === 'success') {
+              setTimeout(() => {
+                setBatchListStep(BatchListStep.Complete)
+              }, 5000)
+            }
+          })
+          .catch((error) => {
+            setBatchListStep(BatchListStep.Approving)
+            setTransactionError(error)
+          })
+      })
+      .catch((err) => {
+        setTransactionError(err)
+        setBatchListStep(BatchListStep.Approving)
+      })
+  }
+
+  const triggerApproveNft = (
+    contract: `0x${string}`,
+    tokenId: string,
+    price: string
+  ) => {
+    setBatchListStep(BatchListStep.Approving)
+    setStepData({
+      totalSteps: 1,
+      stepProgress: 1,
+      currentStep: {
+        kind: 'transaction',
+        action: '',
+        description:
+          'Please approve the collection(s) from your wallet. Each collection only needs to be approved once.',
+        id: '1',
+      },
+      listings: [],
+    })
+    // approve nft
+    wallet
+      ?.writeContract({
+        abi: [
+          {
+            constant: false,
+            inputs: [
+              { internalType: 'address', name: 'to', type: 'address' },
+              { internalType: 'bool', name: 'approved', type: 'bool' },
+            ],
+            name: 'setApprovalForAll',
+            outputs: [],
+            payable: false,
+            stateMutability: 'nonpayable',
+            type: 'function',
+          },
+        ],
+        address: contract as `0x${string}`,
+        functionName: 'setApprovalForAll',
+        args: [
+          ContractConfig[aura?.id ? aura?.id : 1235]
+            ?.ERC721TRANSFERHELPER as `0x${string}`,
+          true,
+        ],
+        gas: 500000n,
+      })
+      .then((hash) => {
+        publicClient
+          .waitForTransactionReceipt({ hash })
+          .then(() => {
+            triggerListTokenContract(contract, tokenId, price)
+          })
+          .catch((error) => {
+            triggerListTokenContract(contract, tokenId, price)
+            setTransactionError(error)
+          })
+      })
+      .catch((err) => {
+        setTransactionError(err)
+        setBatchListStep(BatchListStep.Approving)
+      })
+  }
 
   useEffect(() => {
     if (stepData) {
