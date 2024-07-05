@@ -19,10 +19,18 @@ import { UserToken } from 'pages/portfolio/[[...address]]'
 import { FC, useCallback, useEffect, useState } from 'react'
 import { useAccount, useWalletClient, useSwitchChain, useConfig } from 'wagmi'
 import { ApprovalCollapsible } from './ApprovalCollapsible'
-import { formatUnits, parseUnits, zeroAddress } from 'viem'
+import {
+  createPublicClient,
+  formatUnits,
+  http,
+  parseUnits,
+  zeroAddress,
+} from 'viem'
 import useOnChainRoyalties, {
   OnChainRoyaltyReturnType,
 } from 'hooks/useOnChainRoyalties'
+import { aura } from 'utils/aura-chain'
+import { ContractConfig } from 'components/common/common'
 
 enum BatchListStep {
   Approving,
@@ -54,7 +62,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
   const [open, setOpen] = useState(false)
   const { data: wallet } = useWalletClient()
   const { openConnectModal } = useConnectModal()
-  const { chain: activeChain } = useAccount()
+  const { chain: activeChain, address } = useAccount()
   const marketplaceChain = useMarketplaceChain()
   const { switchChainAsync } = useSwitchChain()
   const isInTheWrongNetwork = Boolean(
@@ -70,6 +78,98 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
   const [uniqueMarketplaces, setUniqueMarketplaces] = useState<Marketplace[]>(
     []
   )
+  const [publicClient, setPublicClient] = useState<any>(undefined)
+  const [isApproveModule, setIsApproveModule] = useState(false)
+  const [isApproveNft, setIsApproveNft] = useState(false)
+
+  useEffect(() => {
+    setPublicClient(
+      createPublicClient({
+        chain: aura,
+        transport: http(),
+      })
+    )
+  }, [])
+
+  const checkIsApproveModuleAsk = () => {
+    publicClient
+      ?.readContract({
+        abi: [
+          {
+            inputs: [
+              { internalType: 'address', name: '_user', type: 'address' },
+              { internalType: 'address', name: '_module', type: 'address' },
+            ],
+            name: 'isModuleApproved',
+            outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+            stateMutability: 'view',
+          type: 'function',
+          },
+        ],
+        address: ContractConfig[aura?.id ? aura?.id : 1235]
+          ?.ZORA_MODULE_MANAGER_ADDRESS as `0x${string}`,
+        functionName: 'isModuleApproved',
+        args: [
+          address as `0x${string}`,
+          ContractConfig[aura?.id ? aura?.id : 1235]
+            ?.ASK1_1_MODULE_ADDRESS as `0x${string}`,
+        ],
+      })
+      .then((res) => {
+        if (res) {
+          setIsApproveModule(true)
+        }
+      })
+      .catch((err) => {
+        setIsApproveModule(false)
+        console.log(err)
+        console.log('message: ' + err?.message)
+      })
+  }
+
+  // const checkIsApproveNft = () => {
+  //   publicClient
+  //     ?.readContract({
+  //       abi: [
+  //         {
+  //           constant: true,
+  //           inputs: [
+  //             { internalType: 'address', name: 'owner', type: 'address' },
+  //             { internalType: 'address', name: 'operator', type: 'address' },
+  //           ],
+  //           name: 'isApprovedForAll',
+  //           outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+  //           payable: false,
+  //           stateMutability: 'view',
+  //           type: 'function',
+  //         },
+  //       ],
+  //       address: contract as `0x${string}`,
+  //       functionName: 'isApprovedForAll',
+  //       args: [
+  //         account?.address as `0x${string}`,
+  //         ContractConfig[chainId ? chainId : 1235]
+  //           ?.ERC721TRANSFERHELPER as `0x${string}`,
+  //       ],
+  //     })
+  //     .then((res) => {
+  //       if (res) {
+  //         setIsApproveNft(true)
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       setIsApproveNft(false)
+  //       console.log(err)
+  //       console.log('message: ' + err?.message)
+  //     })
+  // }
+
+  useEffect(() => {
+    if (publicClient) {
+      checkIsApproveModuleAsk()
+      checkIsApproveNft()
+    }
+  }, [publicClient])
 
   useEffect(() => {
     if (stepData) {
