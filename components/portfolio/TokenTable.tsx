@@ -351,6 +351,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
     : accountAddress
 
   let creatorRoyalties = royalty ? royalty * 0.01 : 0
+  const queryBidId = token?.token?.topBid?.id as string
 
   if (isSmallDevice) {
     return (
@@ -438,6 +439,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
           {token?.token?.topBid?.price?.amount?.decimal && isOwner ? (
             <AcceptBid
               tokenId={token.token.tokenId}
+              bidId={queryBidId}
               collectionId={token?.token?.contract}
               mutate={mutate}
               openState={[
@@ -906,6 +908,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                   },
                 ]}
                 tokenId={token.token.tokenId}
+                bidId={queryBidId}
                 collectionId={token?.token?.contract}
                 buttonCss={{
                   px: '32px',
@@ -918,7 +921,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                 buttonChildren={
                   <Flex align="center" css={{ gap: '$2' }}>
                     <FontAwesomeIcon icon={faBolt} />
-                    Sell
+                    Accept
                   </Flex>
                 }
                 mutate={mutate}
