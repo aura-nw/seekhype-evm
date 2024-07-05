@@ -1,6 +1,6 @@
 import { faGasPump, faHand } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useBids } from '@sh-reservoir0x/reservoir-kit-ui'
+import { useBids, useCoinConversion } from '@sh-reservoir0x/reservoir-kit-ui'
 import { AcceptBid } from 'components/buttons'
 import CancelBid from 'components/buttons/CancelBid'
 import EditBid from 'components/buttons/EditBid'
@@ -22,17 +22,23 @@ import { MutatorCallback } from 'swr'
 import { useIntersectionObserver } from 'usehooks-ts'
 import { formatDollar } from 'utils/numbers'
 import { OnlyUserOrdersToggle } from './OnlyUserOrdersToggle'
-import { zeroAddress } from 'viem'
+import { formatUnits, parseUnits, zeroAddress } from 'viem'
 
 type Props = {
   address?: string
   token: Parameters<typeof useBids>['0']['token']
   is1155: boolean
-  isOwner: boolean,
+  isOwner: boolean
   royalty?: number
 }
 
-export const OffersTable: FC<Props> = ({ token, address, is1155, isOwner, royalty }) => {
+export const OffersTable: FC<Props> = ({
+  token,
+  address,
+  is1155,
+  isOwner,
+  royalty,
+}) => {
   const loadMoreRef = useRef<HTMLDivElement>(null)
   const loadMoreObserver = useIntersectionObserver(loadMoreRef, {})
   const [userOnly, setUserOnly] = useState(false)
@@ -166,9 +172,11 @@ const OfferTableRow: FC<OfferTableRowProps> = ({
     process.env.NEXT_PUBLIC_PROXY_URL
   }${proxyApi}/redirect/sources/${offerSourceDomain || offerSourceName}/logo/v2`
 
-  let creatorRoyalties = royalty
-    ? royalty * 0.01
-    : 0
+  let creatorRoyalties = royalty ? royalty * 0.01 : 0
+
+  const coinConversion = useCoinConversion('USD')
+  const usdPrice = coinConversion.length > 0 ? coinConversion[0].price : 0
+  const usdPriceRaw = parseUnits(usdPrice.toString(), 6)
 
   return (
     <TableRow
@@ -214,9 +222,16 @@ const OfferTableRow: FC<OfferTableRowProps> = ({
               />
             </Flex>
           </Tooltip>
-          {offer.price?.amount?.usd ? (
+          {offer.price?.amount?.raw ? (
             <Text style="body2" css={{ color: '$gray11' }} ellipsify>
-              {formatDollar(offer.price?.amount?.usd)}
+              | {formatDollar(
+                Number(
+                  formatUnits(
+                    BigInt(offer.price?.amount?.raw || 0) * usdPriceRaw,
+                    24
+                  )
+                )
+              )}
             </Text>
           ) : null}
         </Flex>
@@ -264,6 +279,7 @@ const OfferTableRow: FC<OfferTableRowProps> = ({
               buttonProps={{ color: 'primary' }}
               buttonCss={{ fontSize: 14, px: '$4', py: '$2', minHeight: 36 }}
               collectionRoyalty={creatorRoyalties}
+              mutate={mutate}
             />
           ) : null}
           {/* Not Owner and is user offer, owner of erc 1155 and is your offer */}
