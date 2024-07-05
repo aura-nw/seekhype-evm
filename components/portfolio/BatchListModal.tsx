@@ -327,6 +327,12 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
       })
   }
 
+  const buildApproveNftContractAbi = (batchListing) => {
+    batchListing.forEach((listing) => {
+
+    })
+  }
+
   useEffect(() => {
     if (stepData) {
       const orderKind = stepData.listings[0].listing.orderKind || 'exchange'
@@ -409,65 +415,81 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
 
     setBatchListStep(BatchListStep.Approving)
 
-    client.actions
-      .listToken({
-        listings: batchListingData.map((data) => data.listing),
-        wallet,
-        onProgress: (steps: Execute['steps']) => {
-          const executableSteps = steps.filter(
-            (step) => step.items && step.items.length > 0
-          )
-
-          let stepCount = executableSteps.length
-          let incompleteStepItemIndex: number | null = null
-          let incompleteStepIndex: number | null = null
-
-          executableSteps.find((step, i) => {
-            if (!step.items) {
-              return false
-            }
-
-            incompleteStepItemIndex = step.items.findIndex(
-              (item) => item.status == 'incomplete'
+    if (aura?.id) {
+      // publicClient?.multicall({
+      //   contracts: [
+      //     {
+      //       ...wagmigotchiContract,
+      //       functionName: 'getAlive',
+      //     },
+      //     {
+      //       ...wagmigotchiContract,
+      //       functionName: 'getBoredom',
+      //     },
+      //   ],
+      //   allowFailure: false,
+      // })
+    } else {
+      client.actions
+        .listToken({
+          listings: batchListingData.map((data) => data.listing),
+          wallet,
+          onProgress: (steps: Execute['steps']) => {
+            const executableSteps = steps.filter(
+              (step) => step.items && step.items.length > 0
             )
-            if (incompleteStepItemIndex !== -1) {
-              incompleteStepIndex = i
-              return true
-            }
-          })
 
-          if (
-            incompleteStepIndex === null ||
-            incompleteStepItemIndex === null
-          ) {
-            const currentStep = executableSteps[executableSteps.length - 1]
-            setBatchListStep(BatchListStep.Complete)
-            setStepData({
-              totalSteps: stepCount,
-              stepProgress: stepCount,
-              currentStep,
-              listings: batchListingData,
+            let stepCount = executableSteps.length
+            let incompleteStepItemIndex: number | null = null
+            let incompleteStepIndex: number | null = null
+
+            executableSteps.find((step, i) => {
+              if (!step.items) {
+                return false
+              }
+
+              incompleteStepItemIndex = step.items.findIndex(
+                (item) => item.status == 'incomplete'
+              )
+              if (incompleteStepItemIndex !== -1) {
+                incompleteStepIndex = i
+                return true
+              }
             })
-          } else {
-            setStepData({
-              totalSteps: stepCount,
-              stepProgress: incompleteStepIndex,
-              currentStep: executableSteps[incompleteStepIndex],
-              listings: batchListingData,
-            })
-          }
-        },
-      })
-      .catch((e: any) => {
-        const error = e as Error
-        const transactionError = new Error(
-          'Oops, something went wrong. Please try again.',
-          {
-            cause: error,
-          }
-        )
-        setTransactionError(transactionError)
-      })
+
+            if (
+              incompleteStepIndex === null ||
+              incompleteStepItemIndex === null
+            ) {
+              const currentStep = executableSteps[executableSteps.length - 1]
+              setBatchListStep(BatchListStep.Complete)
+              setStepData({
+                totalSteps: stepCount,
+                stepProgress: stepCount,
+                currentStep,
+                listings: batchListingData,
+              })
+            } else {
+              setStepData({
+                totalSteps: stepCount,
+                stepProgress: incompleteStepIndex,
+                currentStep: executableSteps[incompleteStepIndex],
+                listings: batchListingData,
+              })
+            }
+          },
+        })
+        .catch((e: any) => {
+          const error = e as Error
+          const transactionError = new Error(
+            'Oops, something went wrong. Please try again.',
+            {
+              cause: error,
+            }
+          )
+          setTransactionError(transactionError)
+        })
+    }
   }, [client, listings, wallet])
 
   const trigger = (
