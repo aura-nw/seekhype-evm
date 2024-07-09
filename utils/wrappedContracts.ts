@@ -23,6 +23,7 @@ const wrappedContracts: Record<number, string> = {
   3776: '0xE9CC37904875B459Fa5D0FE37680d36F1ED55e38', // astar zkEVM
   1235: '0x7C258D32e0C5ADda30d18194870b56A38E2EBBbC', //aura evm dev
   1236: '0xE974cC14c93FC6077B0d65F98832B846C5454A0B', //aura evm serenity
+  6231: '0x7f4f375454B34895DAE95e0cCEDc0743B3850893', //aura evm euphoria
 }
 
 export default wrappedContracts
