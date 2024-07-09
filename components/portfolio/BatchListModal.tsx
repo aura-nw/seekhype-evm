@@ -68,6 +68,14 @@ type Props = {
   onCloseComplete?: () => void
 }
 
+type UnapprovedContractItem = {
+  index: number
+  currentItem: {
+    contractAddress: string
+    isApproved: boolean
+  }
+}
+
 const orderFee = process.env.NEXT_PUBLIC_MARKETPLACE_FEE
 const orderFees = orderFee ? [orderFee] : []
 
@@ -93,7 +101,10 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
   )
   const [publicClient, setPublicClient] = useState<any>(undefined)
   const [isApproveModule, setIsApproveModule] = useState(false)
-  const [isApproveNft, setIsApproveNft] = useState(false)
+
+  let unapprovedContracts: UnapprovedContractItem[] = []
+
+  let countApprovedContract = 0
 
   useEffect(() => {
     setPublicClient(
@@ -141,8 +152,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
       })
   }
 
-  const checkIsApproveNft = () => {
-    let isApproveNftContracts: any[] = []
+  const checkIsApproveCollection = (batchListingData?: BatchListingData[]) => {
     const approveNftAbi = {
       abi: [
         {
@@ -159,20 +169,17 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
         },
       ],
     }
-    listings.forEach((listing) => {
-      const result = {
-        address: listing?.token?.token?.contract as `0x${string}`,
-        ...approveNftAbi,
-        args: [
-          address as `0x${string}`,
-          ContractConfig[aura?.id ? aura?.id : 1235]
-            ?.ASK1_1_MODULE_ADDRESS as `0x${string}`,
-        ],
-        functionName: 'isApprovedForAll',
-      }
 
-      isApproveNftContracts.push(result)
-    })
+    const isApproveNftContracts: any[] = listings.map((listing) => ({
+      address: listing?.token?.token?.contract as `0x${string}`,
+      ...approveNftAbi,
+      args: [
+        address as `0x${string}`,
+        ContractConfig[aura?.id ? aura?.id : 1235]
+          ?.ERC721TRANSFERHELPER as `0x${string}`,
+      ],
+      functionName: 'isApprovedForAll',
+    }))
 
     const config = createConfig({
       chains: [aura],
@@ -181,53 +188,51 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
       },
     })
 
+    const listingsContracts = [
+      ...new Set(
+        listings.map(
+          (listing) => listing?.token?.token?.contract as `0x${string}`
+        )
+      ),
+    ]
+
     readContracts(config, {
       contracts: isApproveNftContracts,
       allowFailure: false,
     }).then((res: any[]) => {
-      setIsApproveNft(res?.find((x) => x === false) === undefined)
-    })
+      let _unapprovedContracts: UnapprovedContractItem[] = []
+      res?.map((x, index) => {
+        if (_unapprovedContracts?.length > 0) {
+          const isExist = _unapprovedContracts?.find(
+            (y: UnapprovedContractItem) =>
+              y?.currentItem?.contractAddress === listingsContracts[index]
+          )
 
-    // publicClient
-    //   ?.readContract({
-    //     abi: [
-    //       {
-    //         constant: true,
-    //         inputs: [
-    //           { internalType: 'address', name: 'owner', type: 'address' },
-    //           { internalType: 'address', name: 'operator', type: 'address' },
-    //         ],
-    //         name: 'isApprovedForAll',
-    //         outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
-    //         payable: false,
-    //         stateMutability: 'view',
-    //         type: 'function',
-    //       },
-    //     ],
-    //     address: contract as `0x${string}`,
-    //     functionName: 'isApprovedForAll',
-    //     args: [
-    //       address as `0x${string}`,
-    //       ContractConfig[aura?.id ? aura?.id : 1235]
-    //         ?.ERC721TRANSFERHELPER as `0x${string}`,
-    //     ],
-    //   })
-    //   .then((res) => {
-    //     if (res) {
-    //       setIsApproveNft(true)
-    //     }
-    //   })
-    //   .catch((err) => {
-    //     setIsApproveNft(false)
-    //     console.log(err)
-    //     console.log('message: ' + err?.message)
-    //   })
+          if (isExist) {
+            return
+          }
+        }
+
+        if (!x) {
+          const result = {
+            index,
+            currentItem: {
+              contractAddress: listingsContracts[index],
+              isApproved: x,
+            },
+          }
+          _unapprovedContracts.push(result)
+        }
+      })
+
+      unapprovedContracts = _unapprovedContracts
+    })
   }
 
   useEffect(() => {
     if (publicClient) {
       checkIsApproveModuleAsk()
-      checkIsApproveNft()
+      checkIsApproveCollection()
     }
   }, [publicClient, listings])
 
@@ -292,7 +297,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
         functionName: 'createAsk',
         args: [
           listing?.token?.token?.contract as `0x${string}`,
-          BigInt(Number(listing?.token?.token)),
+          BigInt(Number(listing?.token?.token?.tokenId)),
           parseUnits(listing?.price, 18),
           zeroAddress,
           address as `0x${string}`,
@@ -336,6 +341,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
           ?.ASK1_1_MODULE_ADDRESS as `0x${string}`,
         functionName: `aggregate`,
         args: [calls],
+        gas: 500000n,
       })
       .then((hash) => {
         publicClient
@@ -433,12 +439,12 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
     //   })
   }
 
-  const triggerApproveNft = (
-    contract: `0x${string}`,
-    tokenId: string,
-    price: string
-  ) => {
+  const triggerApproveCollection = (batchListingData: BatchListingData[]) => {
     setBatchListStep(BatchListStep.Approving)
+    const stepItem: any[] = unapprovedContracts?.map((unapproveItem) => ({
+      status: 'incomplete',
+      orderIndexes: [unapproveItem?.index],
+    }))
     setStepData({
       totalSteps: 1,
       stepProgress: 1,
@@ -448,10 +454,17 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
         description:
           'Please approve the collection(s) from your wallet. Each collection only needs to be approved once.',
         id: '1',
+        items: stepItem,
       },
-      listings: [],
+      listings: batchListingData,
     })
     // approve nft
+    approveCollection(
+      unapprovedContracts[countApprovedContract]?.currentItem?.contractAddress
+    )
+  }
+
+  const approveCollection = (contractAddress: string) => {
     wallet
       ?.writeContract({
         abi: [
@@ -468,7 +481,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
             type: 'function',
           },
         ],
-        address: contract as `0x${string}`,
+        address: contractAddress as `0x${string}`,
         functionName: 'setApprovalForAll',
         args: [
           ContractConfig[aura?.id ? aura?.id : 1235]
@@ -481,10 +494,18 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
         publicClient
           .waitForTransactionReceipt({ hash })
           .then(() => {
-            triggerListTokenContract()
+            countApprovedContract++
+            if (countApprovedContract === unapprovedContracts?.length) {
+              triggerListTokenContract()
+              countApprovedContract = 0
+            } else {
+              approveCollection(
+                unapprovedContracts[countApprovedContract]?.currentItem
+                  ?.contractAddress
+              )
+            }
           })
           .catch((error) => {
-            triggerListTokenContract()
             setTransactionError(error)
           })
       })
@@ -496,7 +517,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
 
   useEffect(() => {
     if (stepData) {
-      const orderKind = stepData.listings[0].listing.orderKind || 'exchange'
+      const orderKind = stepData.listings[0]?.listing.orderKind || 'exchange'
 
       switch (stepData.currentStep.kind) {
         case 'transaction': {
@@ -591,6 +612,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
           },
           listings: batchListingData,
         })
+
         // approve module
         await wallet
           ?.writeContract({
@@ -624,10 +646,10 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
             publicClient
               .waitForTransactionReceipt({ hash })
               .then((res) => {
-                // triggerApproveNft()
+                triggerApproveCollection(batchListingData)
               })
               .catch((error) => {
-                // triggerApproveNft()
+                triggerApproveCollection(batchListingData)
                 setTransactionError(error)
               })
           })
@@ -639,8 +661,8 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
         return
       }
 
-      if (!isApproveNft) {
-        // triggerApproveNft()
+      if (unapprovedContracts?.length > 0) {
+        triggerApproveCollection(batchListingData)
       } else {
         triggerListTokenContract()
       }
@@ -788,9 +810,15 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
                 </Text>
               ) : null}
               <Flex direction="column" css={{ gap: '$3', width: '100%' }}>
+                {stepData.currentStep.kind === 'transaction' &&
+                  stepData.currentStep.action === 'approval' && (
+                    <Text css={{ textAlign: 'center' }} style="h6">
+                      Grant the approval
+                    </Text>
+                  )}
                 {stepData.currentStep.kind === 'transaction'
                   ? stepData.currentStep.items?.map((item, i) => {
-                      if (item.data)
+                      if (item)
                         return (
                           <ApprovalCollapsible
                             key={i}
