@@ -1,37 +1,7 @@
 import { defineChain, zeroAddress } from 'viem'
 
-// export const aura = /*#__PURE__*/ defineChain({
-//   id: 1235,
-//   name: 'Aura EVM',
-//   nativeCurrency: {
-//     decimals: 18,
-//     name: 'aura',
-//     symbol: 'aura',
-//   },
-//   rpcUrls: {
-//     default: {
-//       http: ['https://jsonrpc.dev.aura.network/'],
-//     },
-//   },
-//   blockExplorers: {
-//     default: {
-//       name: 'Aura EVM Block Explorer',
-//       url: 'https://explorer.dev.aura.network',
-//     },
-//   },
-//   paymentTokens: [
-//     {
-//       chainId: 1235,
-//       address: zeroAddress,
-//       symbol: 'aura',
-//       name: 'aura',
-//       decimals: 18,
-//     },
-//   ],
-// })
-
 export const aura = /*#__PURE__*/ defineChain({
-  id: 1236,
+  id: 1235,
   name: 'Aura EVM',
   nativeCurrency: {
     decimals: 18,
@@ -40,18 +10,18 @@ export const aura = /*#__PURE__*/ defineChain({
   },
   rpcUrls: {
     default: {
-      http: ['https://jsonrpc.serenity.aura.network/'],
+      http: ['https://jsonrpc.dev.aura.network/'],
     },
   },
   blockExplorers: {
     default: {
       name: 'Aura EVM Block Explorer',
-      url: 'https://serenity.aurascan.io',
+      url: 'https://explorer.dev.aura.network',
     },
   },
   paymentTokens: [
     {
-      chainId: 1236,
+      chainId: 1235,
       address: zeroAddress,
       symbol: 'aura',
       name: 'aura',
@@ -59,6 +29,36 @@ export const aura = /*#__PURE__*/ defineChain({
     },
   ],
 })
+
+// export const aura = /*#__PURE__*/ defineChain({
+//   id: 1236,
+//   name: 'Aura EVM',
+//   nativeCurrency: {
+//     decimals: 18,
+//     name: 'aura',
+//     symbol: 'aura',
+//   },
+//   rpcUrls: {
+//     default: {
+//       http: ['https://jsonrpc.serenity.aura.network/'],
+//     },
+//   },
+//   blockExplorers: {
+//     default: {
+//       name: 'Aura EVM Block Explorer',
+//       url: 'https://serenity.aurascan.io',
+//     },
+//   },
+//   paymentTokens: [
+//     {
+//       chainId: 1236,
+//       address: zeroAddress,
+//       symbol: 'aura',
+//       name: 'aura',
+//       decimals: 18,
+//     },
+//   ],
+// })
 
 // export const aura = /*#__PURE__*/ defineChain({
 //   id: 6321,
