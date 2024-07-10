@@ -100,6 +100,7 @@ export const TokenActions: FC<Props> = ({
     '@sm': {
       maxWidth: 250,
     },
+    borderRadius: 8,
   }
 
   let creatorRoyalties = collection?.royalties?.bps
@@ -213,6 +214,9 @@ export const TokenActions: FC<Props> = ({
           collectionId={token?.token?.collection?.id}
           mutate={mutate}
           buttonCss={buttonCss}
+          buttonProps={{
+            corners: 'square',
+          }}
         />
       )}
 
