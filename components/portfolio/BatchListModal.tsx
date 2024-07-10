@@ -188,13 +188,9 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
       },
     })
 
-    const listingsContracts = [
-      ...new Set(
-        listings.map(
-          (listing) => listing?.token?.token?.contract as `0x${string}`
-        )
-      ),
-    ]
+    const listingsContracts = listings.map(
+      (listing) => listing?.token?.token?.contract as `0x${string}`
+    )
 
     readContracts(config, {
       contracts: isApproveNftContracts,
@@ -782,7 +778,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
         >
           {transactionError && (
             <ErrorWell
-              message={transactionError.message}
+              error={transactionError}
               css={{ width: '100%' }}
             />
           )}
@@ -867,7 +863,11 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
           ) : (
             <Button
               css={{ width: '100%', justifyContent: 'center' }}
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false)
+                unapprovedContracts = []
+                countApprovedContract = 0
+              }}
             >
               Close
             </Button>
@@ -891,6 +891,8 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
             css={{ width: '100%', justifyContent: 'center' }}
             onClick={() => {
               setOpen(false)
+              unapprovedContracts = []
+              countApprovedContract = 0
               onCloseComplete?.()
             }}
           >
