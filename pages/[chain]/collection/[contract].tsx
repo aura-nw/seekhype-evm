@@ -1078,10 +1078,11 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
                                 setPlayingElement(element)
                               }
                             }}
-                            // addToCartEnabled={
-                            //   token.market?.floorAsk?.maker?.toLowerCase() !==
-                            //   address?.toLowerCase()
-                            addToCartEnabled={false}
+                            addToCartEnabled={
+                              token.market?.floorAsk?.maker?.toLowerCase() !==
+                              address?.toLowerCase()
+                            }
+                            // addToCartEnabled={false}
                             showSource={false}
                           />
                         ))}

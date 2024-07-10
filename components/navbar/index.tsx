@@ -82,7 +82,7 @@ const Navbar = () => {
       </Box>
       <Flex align="center" css={{ gap: '$3' }}>
         <MobileSearch key={`${router.asPath}-search`} />
-        {/* <CartButton /> */}
+        <CartButton />
         <HamburgerMenu key={`${router.asPath}-hamburger`} />
       </Flex>
     </Flex>
@@ -266,7 +266,7 @@ const Navbar = () => {
             <ConnectWalletButton />
           </Box>
         )}
-        {/* <CartButton /> */}
+        <CartButton />
       </Flex>
     </Flex>
   )

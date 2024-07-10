@@ -152,7 +152,7 @@ export const TokenActions: FC<Props> = ({
               mutate={mutate}
               openState={!isOwner && isBuyRoute ? buyOpenState : undefined}
             />
-            {/* {!is1155 && (
+            {!is1155 && (
               <AddToCart
                 token={token}
                 buttonCss={{
@@ -162,7 +162,7 @@ export const TokenActions: FC<Props> = ({
                 }}
                 buttonProps={{ corners: 'square' }}
               />
-            )} */}
+            )}
           </Flex>
         )}
       {mintData && mintPrice ? (
