@@ -659,6 +659,7 @@ const IndexPage: NextPage<Props> = ({ assetId, ssr }) => {
                     address={account.address}
                     is1155={is1155}
                     isOwner={isOwner}
+                    offerTableMutate={mutate}
                     royalty={collection?.royalties?.bps || 0}
                   />
                 </TabsContent>

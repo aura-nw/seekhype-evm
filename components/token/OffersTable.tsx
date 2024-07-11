@@ -30,6 +30,7 @@ type Props = {
   is1155: boolean
   isOwner: boolean
   royalty?: number
+  offerTableMutate?: MutatorCallback
 }
 
 export const OffersTable: FC<Props> = ({
@@ -38,6 +39,7 @@ export const OffersTable: FC<Props> = ({
   is1155,
   isOwner,
   royalty,
+  offerTableMutate,
 }) => {
   const loadMoreRef = useRef<HTMLDivElement>(null)
   const loadMoreObserver = useIntersectionObserver(loadMoreRef, {})
@@ -65,6 +67,12 @@ export const OffersTable: FC<Props> = ({
     isFetchingPage,
     isLoading,
   } = useBids(bidsQuery, { revalidateFirstPage: true })
+
+  useEffect(() => {
+    if (offerTableMutate) {
+      offerTableMutate()
+    }
+  }, [offers])
 
   const { data: userOffers } = useBids({ ...bidsQuery, maker: address })
 
@@ -224,7 +232,8 @@ const OfferTableRow: FC<OfferTableRowProps> = ({
           </Tooltip>
           {offer.price?.amount?.raw ? (
             <Text style="body2" css={{ color: '$gray11' }} ellipsify>
-              | {formatDollar(
+              |{' '}
+              {formatDollar(
                 Number(
                   formatUnits(
                     BigInt(offer.price?.amount?.raw || 0) * usdPriceRaw,

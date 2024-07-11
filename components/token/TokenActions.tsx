@@ -100,6 +100,7 @@ export const TokenActions: FC<Props> = ({
     '@sm': {
       maxWidth: 250,
     },
+    borderRadius: 8,
   }
 
   let creatorRoyalties = collection?.royalties?.bps
@@ -213,6 +214,9 @@ export const TokenActions: FC<Props> = ({
           collectionId={token?.token?.collection?.id}
           mutate={mutate}
           buttonCss={buttonCss}
+          buttonProps={{
+            corners: 'square',
+          }}
         />
       )}
 
@@ -240,7 +244,9 @@ export const TokenActions: FC<Props> = ({
                       '@sm': {
                         maxWidth: 250,
                       },
+                      borderRadius: 8,
                     }}
+                    corners='square'
                     color="gray3"
                   >
                     <FontAwesomeIcon
@@ -263,7 +269,9 @@ export const TokenActions: FC<Props> = ({
                     '@sm': {
                       maxWidth: 250,
                     },
+                    borderRadius: 8,
                   }}
+                  corners='square'
                   color="gray3"
                 >
                   Cancel Offer
