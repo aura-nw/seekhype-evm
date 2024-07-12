@@ -88,18 +88,12 @@ export const Footer = () => {
   const isMobile = useMediaQuery({ maxWidth: 600 }) && isMounted
   const { theme } = useTheme()
   const [email, setEmail] = useState('')
-  const [logoSrc, setLogoSrc] = useState(
-    'sh-evm-logo.svg'
-  )
+  const [logoSrc, setLogoSrc] = useState('sh-evm-logo.svg')
   const { routePrefix } = useMarketplaceChain()
   const params = useMemo(() => new URLSearchParams(), [])
 
   useEffect(() => {
-    setLogoSrc(
-      theme === 'dark'
-        ? '/sh-evm-logo-white.svg'
-        : '/sh-evm-logo.svg'
-    )
+    setLogoSrc(theme === 'dark' ? '/sh-evm-logo-white.svg' : '/sh-evm-logo.svg')
   }, [theme])
 
   const subscribeEmail = () => {
@@ -137,8 +131,8 @@ export const Footer = () => {
           <Image src={logoSrc} width={124} height={48} alt="SeekHypeEVM" />
         </Link>
         <Text style="body2" css={{ display: 'block', color: '#161618' }}>
-          Enhance your seamless NFT experience while enjoying utility with
-          premier Web2 brands
+          Enhance your seamless experience with accessibility and composability
+          for IP
         </Text>
         <Flex
           justify="between"
@@ -223,7 +217,7 @@ export const Footer = () => {
             color: '#706d77',
           }}
         >
-          © 2023 SeekHYPE. The Simplest NFT Marketplace
+          © 2023 SeekHYPE. SeekHYPE - NFT Marketplace for IP
         </Text>
         <Flex align={'center'} css={{ gap: 20 }}>
           <Link href={`/${routePrefix}/terms-of-service`}>
