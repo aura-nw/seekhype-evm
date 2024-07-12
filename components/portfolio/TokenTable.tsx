@@ -909,6 +909,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                 ]}
                 tokenId={token.token.tokenId}
                 bidId={queryBidId}
+                isAcceptHighestBid={true}
                 collectionId={token?.token?.contract}
                 buttonCss={{
                   px: '32px',
@@ -921,7 +922,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                 buttonChildren={
                   <Flex align="center" css={{ gap: '$2' }}>
                     <FontAwesomeIcon icon={faBolt} />
-                    Accept
+                    Accept offer
                   </Flex>
                 }
                 mutate={mutate}

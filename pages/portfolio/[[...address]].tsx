@@ -450,7 +450,7 @@ const IndexPage: NextPage = () => {
           openState={[batchAcceptBidModalOpen, setBatchAcceptBidModalOpen]}
           tokens={sellableItems}
           onClose={(data, stepData, currentStep) => {
-            if (tokenTableRef && currentStep == AcceptBidStep.Complete) {
+            if (tokenTableRef) {
               tokenTableRef.current?.mutate()
               setSelectedItems([])
             }

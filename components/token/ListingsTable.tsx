@@ -31,6 +31,7 @@ type Props = {
   is1155: boolean
   isOwner: boolean
   usdPrice?: number
+  listingMutate: MutatorCallback
 }
 
 export const ListingsTable: FC<Props> = ({
@@ -39,6 +40,7 @@ export const ListingsTable: FC<Props> = ({
   is1155,
   isOwner,
   usdPrice,
+  listingMutate,
 }) => {
   const loadMoreRef = useRef<HTMLDivElement>(null)
   const loadMoreObserver = useIntersectionObserver(loadMoreRef, {})
@@ -71,6 +73,12 @@ export const ListingsTable: FC<Props> = ({
     ...listingsQuery,
     maker: address,
   })
+
+  useEffect(() => {
+    if (listingMutate) {
+      listingMutate()
+    }
+  }, [])
 
   const userHasListings = userListings.length > 0
 

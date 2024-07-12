@@ -30,6 +30,7 @@ import {
   Text,
 } from '../primitives'
 import { zeroAddress } from 'viem'
+import { MutatorCallback } from 'swr'
 
 type CollectionActivityResponse = ReturnType<typeof useCollectionActivity>
 type CollectionActivity = CollectionActivityResponse['data'][0]
@@ -61,11 +62,13 @@ type TokenActivityTableProps = {
   activityTypes: NonNullable<
     Exclude<Parameters<typeof useTokenActivity>['1'], boolean>
   >['types']
+  activityMutate: MutatorCallback
 }
 
 export const TokenActivityTable: FC<TokenActivityTableProps> = ({
   id,
   activityTypes,
+  activityMutate,
 }) => {
   const data = useTokenActivity(
     id,
@@ -82,6 +85,12 @@ export const TokenActivityTable: FC<TokenActivityTableProps> = ({
     data.mutate()
     return () => {
       data.setSize(1)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (activityMutate) {
+      activityMutate()
     }
   }, [])
 
