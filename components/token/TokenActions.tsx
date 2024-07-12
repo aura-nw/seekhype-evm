@@ -244,7 +244,9 @@ export const TokenActions: FC<Props> = ({
                       '@sm': {
                         maxWidth: 250,
                       },
+                      borderRadius: 8,
                     }}
+                    corners='square'
                     color="gray3"
                   >
                     <FontAwesomeIcon
@@ -267,7 +269,9 @@ export const TokenActions: FC<Props> = ({
                     '@sm': {
                       maxWidth: 250,
                     },
+                    borderRadius: 8,
                   }}
+                  corners='square'
                   color="gray3"
                 >
                   Cancel Offer
