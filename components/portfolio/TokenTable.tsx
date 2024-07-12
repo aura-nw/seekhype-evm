@@ -456,16 +456,16 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                 maxWidth: '300px',
                 justifyContent: 'center',
                 px: '20px',
-                backgroundColor: '$primary9',
+                backgroundColor: '$button-bg-bg-primary-active',
                 color: 'white',
                 '&:hover': {
-                  backgroundColor: '$primary10',
+                  backgroundColor: '$button-bg-bg-primary-hover',
                 },
               }}
               buttonChildren={
                 <Flex align="center" css={{ gap: '$2' }}>
                   <FontAwesomeIcon icon={faBolt} />
-                  Accept
+                  Accept offer
                 </Flex>
               }
               collectionRoyalty={creatorRoyalties}
@@ -913,10 +913,10 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                 collectionId={token?.token?.contract}
                 buttonCss={{
                   px: '32px',
-                  backgroundColor: '$primary9',
+                  backgroundColor: '$button-bg-bg-primary-active',
                   color: 'white',
                   '&:hover': {
-                    backgroundColor: '$primary10',
+                    backgroundColor: '$button-bg-bg-primary-hover',
                   },
                 }}
                 buttonChildren={
