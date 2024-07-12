@@ -205,6 +205,7 @@ export const TokenActions: FC<Props> = ({
           buttonCss={buttonCss}
           buttonChildren="Accept Offer"
           collectionRoyalty={creatorRoyalties}
+          isAcceptHighestBid={true}
         />
       )}
 
@@ -246,7 +247,7 @@ export const TokenActions: FC<Props> = ({
                       },
                       borderRadius: 8,
                     }}
-                    corners='square'
+                    corners="square"
                     color="gray3"
                   >
                     <FontAwesomeIcon
@@ -271,7 +272,7 @@ export const TokenActions: FC<Props> = ({
                     },
                     borderRadius: 8,
                   }}
-                  corners='square'
+                  corners="square"
                   color="gray3"
                 >
                   Cancel Offer
