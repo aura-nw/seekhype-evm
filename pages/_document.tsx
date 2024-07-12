@@ -28,7 +28,7 @@ class MyDocument extends Document {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta
           name="description"
-          content="Enhance your seamless NFT experience while enjoying utility with premier Web2 brands"
+          content="Enhance your seamless experience with accessibility and composability for IP"
         />
 
         {/* Meta tags */}
@@ -39,53 +39,53 @@ class MyDocument extends Document {
         <link
           rel="shortcut icon"
           type="image/svg"
-          href="https://beta.seekhype.io/assets/imgs/seekhype.png"
+          href="https://evm.seekhype.io/seekhype-evm.webp"
         />
 
         {/* Reservoir meta tags */}
         <meta
           property="reservoir:title"
-          content="The simplest NFT Marketplace"
+          content="SeekHYPE - NFT Marketplace for IP"
         />
         <meta
           property="reservoir:icon"
-          content="https://beta.seekhype.io/assets/imgs/seekhype.png"
+          content="https://evm.seekhype.io/seekhype-evm.webp"
         />
 
         {/* Google / Search Engine Tags */}
         <meta itemProp="name" content="SeekHYPE" />
         <meta
           itemProp="description"
-          content="Enhance your seamless NFT experience while enjoying utility with premier Web2 brands"
+          content="Enhance your seamless experience with accessibility and composability for IP"
         />
         <meta
           itemProp="image"
-          content="https://beta.seekhype.io/assets/imgs/seekhype.png"
+          content="https://evm.seekhype.io/seekhype-evm.webp"
         />
 
         {/* Facebook Meta Tags */}
         <meta property="og:url" content="https://beta.seekhype.io" />
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="The simplest NFT Marketplace" />
+        <meta property="og:title" content="SeekHYPE - NFT Marketplace for IP" />
         <meta
           property="og:description"
-          content="Enhance your seamless NFT experience while enjoying utility with premier Web2 brands"
+          content="Enhance your seamless experience with accessibility and composability for IP"
         />
         <meta
           property="og:image"
-          content="https://beta.seekhype.io/assets/imgs/seekhype.png"
+          content="https://evm.seekhype.io/seekhype-evm.webp"
         />
 
         {/* Twitter Meta Tags */}
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="The simplest NFT Marketplace" />
+        <meta name="twitter:title" content="SeekHYPE - NFT Marketplace for IP" />
         <meta
           name="twitter:description"
-          content="Enhance your seamless NFT experience while enjoying utility with premier Web2 brands"
+          content="Enhance your seamless experience with accessibility and composability for IP"
         />
         <meta
           name="twitter:image"
-          content="https://beta.seekhype.io/assets/imgs/seekhype.png"
+          content="https://evm.seekhype.io/seekhype-evm.webp"
         />
         {/* <meta
           property="reservoir:token-url-mainnet"
