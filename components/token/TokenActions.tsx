@@ -100,7 +100,6 @@ export const TokenActions: FC<Props> = ({
     '@sm': {
       maxWidth: 250,
     },
-    borderRadius: 8,
   }
 
   let creatorRoyalties = collection?.royalties?.bps
@@ -147,7 +146,7 @@ export const TokenActions: FC<Props> = ({
               contract={token.token?.contract}
               executionMethod={intentFillingEnabled ? 'intent' : undefined}
               buttonCss={{ flex: 1, justifyContent: 'center' }}
-              buttonProps={{ corners: 'square' }}
+              buttonProps={{ corners: 'pill' }}
               buttonChildren="Buy Now"
               mutate={mutate}
               openState={!isOwner && isBuyRoute ? buyOpenState : undefined}
@@ -216,7 +215,7 @@ export const TokenActions: FC<Props> = ({
           mutate={mutate}
           buttonCss={buttonCss}
           buttonProps={{
-            corners: 'square',
+            corners: 'pill',
           }}
         />
       )}
@@ -247,7 +246,7 @@ export const TokenActions: FC<Props> = ({
                       },
                       borderRadius: 8,
                     }}
-                    corners="square"
+                    corners="pill"
                     color="gray3"
                   >
                     <FontAwesomeIcon
@@ -272,7 +271,7 @@ export const TokenActions: FC<Props> = ({
                     },
                     borderRadius: 8,
                   }}
-                  corners="square"
+                  corners="pill"
                   color="gray3"
                 >
                   Cancel Offer
