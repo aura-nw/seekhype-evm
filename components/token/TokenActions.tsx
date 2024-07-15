@@ -244,7 +244,6 @@ export const TokenActions: FC<Props> = ({
                       '@sm': {
                         maxWidth: 250,
                       },
-                      borderRadius: 8,
                     }}
                     corners="pill"
                     color="gray3"
@@ -269,7 +268,6 @@ export const TokenActions: FC<Props> = ({
                     '@sm': {
                       maxWidth: 250,
                     },
-                    borderRadius: 8,
                   }}
                   corners="pill"
                   color="gray3"
