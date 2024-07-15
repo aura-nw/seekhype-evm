@@ -60,6 +60,7 @@ const AcceptBid: FC<Props> = ({
       css={buttonCss}
       color="gray3"
       disabled={disabled}
+      corners={'pill'}
       {...buttonProps}
       onClick={() => {
         if (mutate && isAcceptHighestBid) {
