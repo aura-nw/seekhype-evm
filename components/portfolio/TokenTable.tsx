@@ -421,7 +421,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
               maximumFractionDigits={2}
             />
           </Flex>
-          {/* <Flex direction="column" align="start" css={{ width: '100%' }}>
+          <Flex direction="column" align="start" css={{ width: '100%' }}>
             <Text style="subtitle3" color="subtle">
               Top Offer
             </Text>
@@ -433,7 +433,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
               logoHeight={14}
               maximumFractionDigits={2}
             />
-          </Flex> */}
+          </Flex>
         </Flex>
         <Flex css={{ gap: '$2', width: '100%' }}>
           {token?.token?.topBid?.price?.amount?.decimal && isOwner ? (
@@ -456,16 +456,16 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                 maxWidth: '300px',
                 justifyContent: 'center',
                 px: '20px',
-                backgroundColor: '$primary9',
+                backgroundColor: '$button-bg-bg-primary-active',
                 color: 'white',
                 '&:hover': {
-                  backgroundColor: '$primary10',
+                  backgroundColor: '$button-bg-bg-primary-hover',
                 },
               }}
               buttonChildren={
                 <Flex align="center" css={{ gap: '$2' }}>
                   <FontAwesomeIcon icon={faBolt} />
-                  Accept
+                  Accept offer
                 </Flex>
               }
               collectionRoyalty={creatorRoyalties}
@@ -838,42 +838,42 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
           open={
             token?.token?.topBid?.price?.amount?.decimal ? undefined : false
           }
-          // content={
-          //   <Flex direction="column" css={{ gap: '$2' }}>
-          //     <Flex justify="between" css={{ gap: '$3' }}>
-          //       <Text style="body3">Total Offer</Text>
-          //       <FormatCryptoCurrency
-          //         amount={token?.token?.topBid?.price?.amount?.decimal}
-          //         address={token?.token?.topBid?.price?.currency?.contract}
-          //         decimals={token?.token?.topBid?.price?.currency?.decimals}
-          //         textStyle="subtitle3"
-          //         logoHeight={14}
-          //         maximumFractionDigits={2}
-          //       />
-          //     </Flex>
-          //     <Flex justify="between" css={{ gap: '$2' }}>
-          //       <Text style="body3">You Get</Text>
-          //       <FormatCryptoCurrency
-          //         amount={token?.token?.topBid?.price?.netAmount?.decimal}
-          //         address={token?.token?.topBid?.price?.currency?.contract}
-          //         decimals={token?.token?.topBid?.price?.currency?.decimals}
-          //         textStyle="subtitle3"
-          //         logoHeight={14}
-          //         maximumFractionDigits={2}
-          //       />
-          //     </Flex>
-          //   </Flex>
-          // }
+          content={
+            <Flex direction="column" css={{ gap: '$2' }}>
+              <Flex justify="between" css={{ gap: '$3' }}>
+                <Text style="body3">Total Offer</Text>
+                <FormatCryptoCurrency
+                  amount={token?.token?.topBid?.price?.amount?.decimal}
+                  address={token?.token?.topBid?.price?.currency?.contract}
+                  decimals={token?.token?.topBid?.price?.currency?.decimals}
+                  textStyle="subtitle3"
+                  logoHeight={14}
+                  maximumFractionDigits={2}
+                />
+              </Flex>
+              <Flex justify="between" css={{ gap: '$2' }}>
+                <Text style="body3">You Get</Text>
+                <FormatCryptoCurrency
+                  amount={token?.token?.topBid?.price?.netAmount?.decimal}
+                  address={token?.token?.topBid?.price?.currency?.contract}
+                  decimals={token?.token?.topBid?.price?.currency?.decimals}
+                  textStyle="subtitle3"
+                  logoHeight={14}
+                  maximumFractionDigits={2}
+                />
+              </Flex>
+            </Flex>
+          }
         >
-          {/* <Flex direction="column" align="start">
+          <Flex direction="column" align="start">
             <Flex css={{ gap: '$2' }} align="center">
-              {(token.token?.topBid as any)?.source?.icon ? (
+              {/* {(token.token?.topBid as any)?.source?.icon ? (
                 <img
                   src={(token?.token?.topBid as any).source.icon as string}
                   alt="Listing Source Icon"
                   style={{ height: 16, width: 16 }}
                 />
-              ) : null}
+              ) : null} */}
               <FormatCryptoCurrency
                 amount={token?.token?.topBid?.price?.amount?.decimal}
                 address={token?.token?.topBid?.price?.currency?.contract}
@@ -890,7 +890,7 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                 )}
               </Text>
             ) : null}
-          </Flex> */}
+          </Flex>
         </Tooltip>
       </TableCell>
       {isOwner && (
@@ -909,19 +909,20 @@ const TokenTableRow: FC<TokenTableRowProps> = ({
                 ]}
                 tokenId={token.token.tokenId}
                 bidId={queryBidId}
+                isAcceptHighestBid={true}
                 collectionId={token?.token?.contract}
                 buttonCss={{
                   px: '32px',
-                  backgroundColor: '$primary9',
+                  backgroundColor: '$button-bg-bg-primary-active',
                   color: 'white',
                   '&:hover': {
-                    backgroundColor: '$primary10',
+                    backgroundColor: '$button-bg-bg-primary-hover',
                   },
                 }}
                 buttonChildren={
                   <Flex align="center" css={{ gap: '$2' }}>
                     <FontAwesomeIcon icon={faBolt} />
-                    Accept
+                    Accept offer
                   </Flex>
                 }
                 mutate={mutate}
@@ -1138,11 +1139,11 @@ const TableHeading: FC<{ isOwner: boolean }> = ({ isOwner }) => (
         Floor
       </Text>
     </TableCell>
-    {/* <TableCell>
+    <TableCell>
       <Text style="subtitle3" color="subtle">
         Top Offer
       </Text>
-    </TableCell> */}
+    </TableCell>
     {isOwner ? <TableCell></TableCell> : null}
   </HeaderRow>
 )

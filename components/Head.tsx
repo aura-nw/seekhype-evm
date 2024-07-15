@@ -15,9 +15,9 @@ type Props = {
  * @param description - The description of the page.
  */
 export const Head: FC<Props> = ({
-  ogImage = 'https://beta.seekhype.io/assets/imgs/seekhype.png',
-  title = 'The simplest NFT Marketplace',
-  description = 'Enhance your seamless NFT experience while enjoying utility with premier Web2 brands',
+  ogImage = 'https://evm.seekhype.io/seekhype-evm.webp',
+  title = 'SeekHYPE - NFT Marketplace for IP',
+  description = 'Enhance your seamless experience with accessibility and composability for IP',
   metatags = null,
 }) => {
   return (

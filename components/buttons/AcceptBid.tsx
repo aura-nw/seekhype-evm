@@ -1,4 +1,8 @@
-import { AcceptBidModal, AcceptBidStep } from '@sh-reservoir0x/reservoir-kit-ui'
+import {
+  AcceptBidModal,
+  AcceptBidStep,
+  useDynamicTokens,
+} from '@sh-reservoir0x/reservoir-kit-ui'
 import {
   cloneElement,
   ComponentProps,
@@ -6,6 +10,7 @@ import {
   ReactNode,
   useContext,
   useMemo,
+  useState,
 } from 'react'
 import { CSS } from '@stitches/react'
 import { SWRResponse } from 'swr'
@@ -25,6 +30,7 @@ type Props = {
   buttonChildren?: ReactNode
   buttonProps?: ComponentProps<typeof Button>
   collectionRoyalty?: number
+  isAcceptHighestBid?: boolean
   mutate?: SWRResponse['mutate']
 }
 
@@ -38,6 +44,7 @@ const AcceptBid: FC<Props> = ({
   buttonChildren,
   buttonProps,
   collectionRoyalty,
+  isAcceptHighestBid,
   mutate,
 }) => {
   const { isDisconnected } = useAccount()
@@ -49,7 +56,18 @@ const AcceptBid: FC<Props> = ({
   const { data: signer } = useWalletClient()
 
   const trigger = (
-    <Button css={buttonCss} color="gray3" disabled={disabled} {...buttonProps}>
+    <Button
+      css={buttonCss}
+      color="gray3"
+      disabled={disabled}
+      corners={'pill'}
+      {...buttonProps}
+      onClick={() => {
+        if (mutate && isAcceptHighestBid) {
+          mutate()
+        }
+      }}
+    >
       {buttonChildren}
     </Button>
   )
@@ -60,7 +78,7 @@ const AcceptBid: FC<Props> = ({
           {
             collectionId: collectionId,
             tokenId: tokenId,
-            bidIds: bidId ? [bidId] : undefined,
+            bidIds: bidId ? [bidId] : [],
             royalty: collectionRoyalty,
           },
         ]
@@ -83,7 +101,7 @@ const AcceptBid: FC<Props> = ({
         tokens={tokens}
         chainId={marketplaceChain.id}
         onClose={(data, stepData, currentStep) => {
-          if (mutate && currentStep == AcceptBidStep.Complete) {
+          if (mutate) {
             mutate()
           }
         }}

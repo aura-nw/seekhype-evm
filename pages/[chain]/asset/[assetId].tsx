@@ -642,6 +642,7 @@ const IndexPage: NextPage<Props> = ({ assetId, ssr }) => {
                   <TokenActivityTable
                     id={`${contract}:${token?.token?.tokenId}`}
                     activityTypes={activityTypes}
+                    activityMutate={mutate}
                   />
                 </TabsContent>
                 <TabsContent value="listings">
@@ -651,6 +652,7 @@ const IndexPage: NextPage<Props> = ({ assetId, ssr }) => {
                     is1155={is1155}
                     isOwner={isOwner}
                     usdPrice={usdPrice}
+                    listingMutate={mutate}
                   />
                 </TabsContent>
                 <TabsContent value="offers" css={{ mr: -15, width: '100%' }}>
@@ -659,6 +661,7 @@ const IndexPage: NextPage<Props> = ({ assetId, ssr }) => {
                     address={account.address}
                     is1155={is1155}
                     isOwner={isOwner}
+                    offerTableMutate={mutate}
                     royalty={collection?.royalties?.bps || 0}
                   />
                 </TabsContent>
