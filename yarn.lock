@@ -1937,10 +1937,8 @@
     "@sentry/cli" "^1.77.1"
     webpack-sources "^2.0.0 || ^3.0.0"
 
-"@sh-reservoir0x/reservoir-kit-ui@0.2.6-g":
-  version "0.2.6-g"
-  resolved "https://registry.yarnpkg.com/@sh-reservoir0x/reservoir-kit-ui/-/reservoir-kit-ui-0.2.6-g.tgz#71b021a2f63d4b4bc5b107980f12240eda228480"
-  integrity sha512-dOzy1RyANXqPL4tm5EKQKprsNM7f5N92l1jPYxcy5D1iOKw9IFLdBUFLvDYhvWDzmJ+BBwNwn10ejIXbujzQxQ==
+"@sh-reservoir0x/reservoir-kit-ui@file:../seekhype-reservoir-ui-kit/packages/ui":
+  version "0.2.6-r"
   dependencies:
     "@fortawesome/fontawesome-svg-core" "^6.2.1"
     "@fortawesome/free-brands-svg-icons" "^6.2.1"
