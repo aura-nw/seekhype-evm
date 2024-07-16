@@ -305,14 +305,14 @@ export const CollectionDetails: FC<Props> = ({
             //     ? `${collection?.floorAsk?.price?.amount?.decimal} ${collection?.floorAsk?.price?.currency?.symbol}`
             //     : '-',
             // },
-            {
-              name: 'Top offer',
-              value: collection?.topBid?.price?.amount?.decimal
-                ? `${collection?.topBid?.price?.amount?.decimal || 0} ${
-                    collection?.topBid?.price?.currency?.symbol
-                  }`
-                : '-',
-            },
+            // {
+            //   name: 'Top offer',
+            //   value: collection?.topBid?.price?.amount?.decimal
+            //     ? `${collection?.topBid?.price?.amount?.decimal || 0} ${
+            //         collection?.topBid?.price?.currency?.symbol
+            //       }`
+            //     : '-',
+            // },
             // {
             //   name: '24h Volume',
             //   value: `${Number(
