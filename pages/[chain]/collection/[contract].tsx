@@ -1018,7 +1018,7 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
                         )}
                       </Text>
                     </Flex>
-                    <Flex css={{ gap: '$1' }}>
+                    {/* <Flex css={{ gap: '$1' }}>
                       <Text style="body1" as="p" color="subtle">
                         Top offer
                       </Text>
@@ -1029,7 +1029,7 @@ const CollectionPage: NextPage<Props> = ({ id, ssr }) => {
                             }`
                           : '-'}
                       </Text>
-                    </Flex>
+                    </Flex> */}
                     <Flex css={{ gap: '$1' }}>
                       <Text style="body1" as="p" color="subtle">
                         Count
