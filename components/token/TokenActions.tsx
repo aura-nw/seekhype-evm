@@ -146,7 +146,7 @@ export const TokenActions: FC<Props> = ({
               contract={token.token?.contract}
               executionMethod={intentFillingEnabled ? 'intent' : undefined}
               buttonCss={{ flex: 1, justifyContent: 'center' }}
-              buttonProps={{ corners: 'pill' }}
+              buttonProps={{ corners: 'pillSquareRight' }}
               buttonChildren="Buy Now"
               mutate={mutate}
               openState={!isOwner && isBuyRoute ? buyOpenState : undefined}
@@ -159,7 +159,7 @@ export const TokenActions: FC<Props> = ({
                   p: 0,
                   justifyContent: 'center',
                 }}
-                buttonProps={{ corners: 'square' }}
+                buttonProps={{ corners: 'pillSquareLeft' }}
               />
             )}
           </Flex>

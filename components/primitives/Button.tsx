@@ -67,6 +67,18 @@ const Button = styled('button', {
       pill: {
         borderRadius: 99999,
       },
+      pillSquareRight: {
+        borderTopLeftRadius: 99999,
+        borderBottomLeftRadius: 99999,
+        borderBottomRightRadius: 0,
+        borderTopRightRadius: 0,
+      },
+      pillSquareLeft: {
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 99999,
+        borderTopRightRadius: 99999,
+      },
       circle: {
         borderRadius: '99999px',
         alignItems: 'center',
