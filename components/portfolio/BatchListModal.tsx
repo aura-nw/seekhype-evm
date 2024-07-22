@@ -232,7 +232,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
     }
   }, [publicClient, listings])
 
-  const triggerListTokenContract = () => {
+  const triggerListTokenContract = (batchListingData: BatchListingData[]) => {
     setBatchListStep(BatchListStep.Approving)
     setStepData({
       totalSteps: 1,
@@ -244,7 +244,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
           'Please review and confirm to create the listing from your wallet.',
         id: '1',
       },
-      listings: [],
+      listings: batchListingData,
     })
     // list token
     const calls = listings?.map((listing) => ({
@@ -460,7 +460,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
     )
   }
 
-  const approveCollection = (contractAddress: string) => {
+  const approveCollection = (contractAddress: string, batchListingData?: BatchListingData[]) => {
     wallet
       ?.writeContract({
         abi: [
@@ -492,7 +492,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
           .then(() => {
             countApprovedContract++
             if (countApprovedContract === unapprovedContracts?.length) {
-              triggerListTokenContract()
+              triggerListTokenContract(batchListingData || [])
               countApprovedContract = 0
             } else {
               approveCollection(
@@ -525,7 +525,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
           break
         }
         case 'signature': {
-          setStepTitle(`Confirm listings in your wallet`)
+          setStepTitle(`Confirm listings`)
           break
         }
       }
@@ -660,7 +660,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
       if (unapprovedContracts?.length > 0) {
         triggerApproveCollection(batchListingData)
       } else {
-        triggerListTokenContract()
+        triggerListTokenContract(batchListingData)
       }
     } else {
       client.actions
@@ -755,7 +755,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
   }
   return (
     <Modal
-      title="Complete Listings"
+      title="List items for sale"
       trigger={trigger}
       open={open}
       onOpenChange={(open) => {
@@ -858,7 +858,7 @@ const BatchListModal: FC<Props> = ({ listings, disabled, onCloseComplete }) => {
               css={{ width: '100%', justifyContent: 'center' }}
               disabled={true}
             >
-              Waiting for Approval...
+              Waiting for approval...
             </Button>
           ) : (
             <Button
