@@ -101,7 +101,7 @@ export const Modal = forwardRef<ElementRef<typeof Dialog>, Props>(
         >
           {children}
         </Box>
-        <Flex
+        {/* <Flex
           css={{
             mx: 'auto',
             alignItems: 'center',
@@ -120,7 +120,7 @@ export const Modal = forwardRef<ElementRef<typeof Dialog>, Props>(
               Powered by <Logo />
             </Text>
           </Anchor>
-        </Flex>
+        </Flex> */}
       </Dialog>
     )
   }
